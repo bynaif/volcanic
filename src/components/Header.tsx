@@ -77,30 +77,30 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute, onNavigate, title 
               onClick={() => setShowModal(true)}
               aria-label="View data feed status"
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 ${
-                data
+                error
+                  ? 'bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/30 text-amber-300'
+                  : data
                   ? 'bg-emerald-500/10 hover:bg-emerald-500/20 border-emerald-500/30 text-emerald-300'
-                  : error
-                  ? 'bg-rose-500/10 hover:bg-rose-500/20 border-rose-500/30 text-rose-300'
                   : 'bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/30 text-amber-300'
               }`}
             >
               <span className="relative flex h-2 w-2">
                 <span
                   className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
-                    data ? 'bg-emerald-400' : error ? 'bg-rose-400' : 'bg-amber-400'
+                    error ? 'bg-amber-400' : data ? 'bg-emerald-400' : 'bg-amber-400'
                   }`}
                 ></span>
                 <span
                   className={`relative inline-flex rounded-full h-2 w-2 ${
-                    data ? 'bg-emerald-400' : error ? 'bg-rose-400' : 'bg-amber-400'
+                    error ? 'bg-amber-400' : data ? 'bg-emerald-400' : 'bg-amber-400'
                   }`}
                 ></span>
               </span>
               <span className="text-[11px] font-medium hidden sm:inline">
-                {data ? 'USGS Live' : error ? 'Feed Offline' : 'Syncing...'}
+                {error ? (data ? 'Refresh Failed' : 'Feed Unavailable') : data ? 'USGS Live' : 'Syncing...'}
               </span>
               <span className="text-[11px] font-medium sm:hidden">
-                {data ? 'Live' : error ? 'Offline' : 'Sync'}
+                {error ? (data ? 'Stale' : 'Offline') : data ? 'Live' : 'Sync'}
               </span>
             </button>
 

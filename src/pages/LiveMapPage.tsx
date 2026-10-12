@@ -559,6 +559,7 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
         count={filteredFeatures.length}
         onRefresh={refetch}
         isRefreshing={loading}
+        error={error}
       />
 
       {/* Control bar: Volcano Search box + Magnitude filters + Locate button */}

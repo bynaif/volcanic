@@ -17,13 +17,18 @@ export const TelemetryStatusModal: React.FC<TelemetryStatusModalProps> = ({ isOp
   const handleTestConnection = async () => {
     setIsPinging(true);
     setPingResult(null);
+
     try {
-      await refetch();
-      setIsPinging(false);
-      setPingResult('Connection verified: USGS GeoJSON all-day stream active & responding with HTTP 200.');
+      const succeeded = await refetch();
+      setPingResult(
+        succeeded
+          ? 'Connection verified: USGS GeoJSON feed responded successfully.'
+          : 'Connection probe failed: USGS refresh failed. Existing cached data may still be available.'
+      );
     } catch {
+      setPingResult('Connection probe failed: Unable to refresh the USGS stream.');
+    } finally {
       setIsPinging(false);
-      setPingResult('Connection probe failed: Unable to connect to USGS stream.');
     }
   };
 
@@ -64,15 +69,19 @@ export const TelemetryStatusModal: React.FC<TelemetryStatusModalProps> = ({ isOp
             </div>
             <div className="flex items-center justify-between text-xs">
               <span className="text-slate-400">USGS Seismic Ingest</span>
-              {data ? (
-                <span className="text-emerald-400 font-medium flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  Live Connected ({data.features.length} quakes)
+              {error ? (
+                <span className="text-amber-300 font-medium">
+                  {data ? 'Refresh Failed · Cached Data Available' : 'Feed Unavailable'}
                 </span>
               ) : loading ? (
                 <span className="text-cyan-400 font-medium">Connecting...</span>
+              ) : data ? (
+                <span className="text-emerald-400 font-medium flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  Live Connected ({data.features.length} quakes)
+                </span>
               ) : (
-                <span className="text-rose-400 font-medium">Feed Disrupted</span>
+                <span className="text-rose-400 font-medium">Feed Unavailable</span>
               )}
             </div>
             <div className="flex items-center justify-between text-xs">

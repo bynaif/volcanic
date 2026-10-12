@@ -97,6 +97,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           count={data?.features?.length}
           onRefresh={refetch}
           isRefreshing={loading}
+          error={error}
         />
 
         {error ? (

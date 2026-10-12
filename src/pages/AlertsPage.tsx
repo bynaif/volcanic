@@ -165,6 +165,7 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({ onNavigate }) => {
           count={alertQuakes.length}
           onRefresh={refetch}
           isRefreshing={loading}
+          error={error}
         />
 
         {data && (

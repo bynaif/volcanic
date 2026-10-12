@@ -17,14 +17,14 @@ export function useEarthquakeData() {
   );
   const isMounted = useRef(true);
 
-  const fetchData = useCallback(async (isManualRetry = false) => {
+  const fetchData = useCallback(async (isManualRetry = false): Promise<boolean> => {
     // If not manual retry and cache is fresher than 30s, use cache
     if (!isManualRetry && cachedFeed && Date.now() - lastFetchTimestamp < 30000) {
       setData(cachedFeed);
       setFetchTime(new Date(lastFetchTimestamp));
       setLoading(false);
       setError(null);
-      return;
+      return true;
     }
 
     setLoading(true);
@@ -55,6 +55,7 @@ export function useEarthquakeData() {
         setError(null);
         setLoading(false);
       }
+      return true;
     } catch (err) {
       if (isMounted.current) {
         const errorMsg =
@@ -64,6 +65,7 @@ export function useEarthquakeData() {
         setError(errorMsg);
         setLoading(false);
       }
+      return false;
     }
   }, []);
 

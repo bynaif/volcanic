@@ -334,6 +334,7 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
           count={nearbyEarthquakes.length}
           onRefresh={refetchQuakes}
           isRefreshing={quakeLoading}
+          error={quakeError}
         />
 
         {quakeError ? (

@@ -10,6 +10,7 @@ interface DataCardHeaderProps {
   count?: number;
   onRefresh?: () => void;
   isRefreshing?: boolean;
+  error?: string | null;
   className?: string;
 }
 
@@ -21,6 +22,7 @@ export const DataCardHeader: React.FC<DataCardHeaderProps> = ({
   count,
   onRefresh,
   isRefreshing = false,
+  error = null,
   className = '',
 }) => {
   // Format feed's own timestamp
