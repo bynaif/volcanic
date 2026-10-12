@@ -1,15 +1,11 @@
+
 import React, { useState, useEffect } from 'react';
 import {
-  Settings,
   ArrowLeft,
   Bell,
   Gauge,
-  Sliders,
-  Moon,
-  RefreshCw,
   Activity,
   CheckCircle2,
-  Trash2,
 } from 'lucide-react';
 import { AppRoute, AppSettings } from '../../types';
 import { EmptyState } from '../../components/EmptyState';
@@ -26,11 +22,13 @@ const DEFAULT_SETTINGS: AppSettings = {
   neonAccents: true,
 };
 
-export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
+export const SettingsPage: React.FC<SettingsPageProps> = ({
+  onNavigate,
+}) => {
   const [settings, setSettings] = useState<AppSettings>(() => {
     try {
       const saved = localStorage.getItem('volcanic_settings');
-      return saved ? JSON.parse(saved) : DEFAULT_SETTINGS;
+      return saved ? { ...DEFAULT_SETTINGS, ...JSON.parse(saved) } : DEFAULT_SETTINGS;
     } catch {
       return DEFAULT_SETTINGS;
     }
@@ -42,45 +40,61 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
   useEffect(() => {
     try {
       localStorage.setItem('volcanic_settings', JSON.stringify(settings));
-    } catch (e) {
-      console.error(e);
+    } catch {
+      setSaveToast('Unable to save settings in this browser.');
     }
   }, [settings]);
 
-  const updateSetting = <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
+  const updateSetting = <K extends keyof AppSettings>(
+    key: K,
+    value: AppSettings[K],
+  ) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
     setSaveToast(`Setting "${key}" updated.`);
-    setTimeout(() => setSaveToast(null), 2500);
-  };
-
-  const handleRequestNotifications = async () => {
-    if ('Notification' in window) {
-      try {
-        const permission = await Notification.requestPermission();
-        if (permission === 'granted') {
-          updateSetting('notificationsEnabled', true);
-          setSaveToast('Push notification permission granted!');
-        } else {
-          updateSetting('notificationsEnabled', false);
-          setSaveToast('Notification permission denied by browser.');
-        }
-      } catch (err) {
-        setSaveToast('Notification API error or unsupported.');
-      }
-    } else {
-      setSaveToast('Notifications not supported by this browser.');
-    }
   };
 
   const handleResetDefaults = () => {
     setSettings(DEFAULT_SETTINGS);
+    setDiagnosticsMessage(null);
     setSaveToast('Reset to default settings.');
-    setTimeout(() => setSaveToast(null), 2500);
+  };
+
+  const handleRunDiagnostics = () => {
+    try {
+      const stored = localStorage.getItem('volcanic_settings');
+
+      if (stored === null) {
+        setDiagnosticsMessage(
+          'Browser storage is accessible, but no saved settings were found.',
+        );
+        return;
+      }
+
+      const parsed: unknown = JSON.parse(stored);
+
+      if (
+        typeof parsed !== 'object' ||
+        parsed === null ||
+        !('unitSystem' in parsed)
+      ) {
+        setDiagnosticsMessage(
+          'Browser storage is accessible, but the saved settings format appears invalid.',
+        );
+        return;
+      }
+
+      setDiagnosticsMessage(
+        'Local storage check passed. Saved settings were read and parsed successfully. No upstream API connectivity was tested.',
+      );
+    } catch {
+      setDiagnosticsMessage(
+        'Local storage check failed. Browser storage may be blocked or the saved settings may be invalid.',
+      );
+    }
   };
 
   return (
     <div className="space-y-6 pb-20 md:pb-8">
-      {/* Top Navigation */}
       <div className="flex items-center justify-between">
         <button
           onClick={() => onNavigate('more')}
@@ -89,7 +103,9 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to More</span>
         </button>
-        <span className="text-xs font-mono text-cyan-400">Settings Engine Active</span>
+        <span className="text-xs font-mono text-cyan-400">
+          Local Settings
+        </span>
       </div>
 
       <div>
@@ -97,12 +113,16 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
           Application Settings & Diagnostics
         </h1>
         <p className="text-xs text-slate-400 mt-1">
-          Configure notification preferences, unit measurements, and local telemetry cache.
+          Configure saved preferences and inspect local settings storage.
+          Push notifications and upstream telemetry are not connected.
         </p>
       </div>
 
       {saveToast && (
-        <div className="p-3 rounded-xl bg-cyan-950/40 border border-cyan-800/60 text-xs text-cyan-300 flex items-center justify-between animate-in fade-in duration-150">
+        <div
+          role="status"
+          className="p-3 rounded-xl bg-cyan-950/40 border border-cyan-800/60 text-xs text-cyan-300 flex items-center justify-between"
+        >
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-cyan-400" />
             <span>{saveToast}</span>
@@ -116,9 +136,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* Settings Form */}
       <div className="space-y-4">
-        {/* Section 1: Notifications */}
         <section className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-4">
           <div className="flex items-center gap-2 text-sm font-semibold text-white">
             <Bell className="w-4 h-4 text-cyan-400" />
@@ -128,37 +146,48 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
           <div className="flex items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
-                <p className="text-xs font-medium text-slate-200">Push Notifications</p>
+                <p className="text-xs font-medium text-slate-200">
+                  Push Notifications
+                </p>
                 <span className="text-[10px] text-amber-400 font-mono px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30">
                   Coming soon
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 mt-0.5">
-                Automated alert dispatch is currently in development. Push notifications are not delivered at this time.
+                Notifications are not delivered by VOLCANIC yet.
               </p>
             </div>
             <button
               type="button"
-              disabled={true}
-              aria-disabled="true"
+              disabled
               aria-label="Push notifications coming soon"
-              className="relative inline-flex h-6 w-11 shrink-0 cursor-not-allowed rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out bg-slate-800 opacity-60"
+              className="relative inline-flex h-6 w-11 shrink-0 cursor-not-allowed rounded-full border-2 border-transparent bg-slate-800 opacity-60"
             >
-              <span className="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-slate-400 shadow-lg ring-0 transition duration-200 ease-in-out translate-x-0" />
+              <span className="pointer-events-none inline-block h-5 w-5 rounded-full bg-slate-400 shadow-lg" />
             </button>
           </div>
 
-          <div className="flex items-center justify-between gap-4 pt-3 border-t border-slate-800/80">
-            <div>
-              <p className="text-xs font-medium text-slate-200">Alert Severity Filter</p>
-              <p className="text-[11px] text-slate-400">
-                Minimum severity required to trigger a push notification
-              </p>
-            </div>
+          <div className="pt-3 border-t border-slate-800/80 space-y-2">
+            <label
+              htmlFor="alert-threshold"
+              className="text-xs font-medium text-slate-200"
+            >
+              Alert Severity Preference
+            </label>
+            <p className="text-[11px] text-slate-400">
+              Saved for future notification support. This does not filter
+              current alerts.
+            </p>
             <select
+              id="alert-threshold"
               value={settings.alertThreshold}
-              onChange={(e) => updateSetting('alertThreshold', e.target.value as AppSettings['alertThreshold'])}
-              className="px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+              onChange={(e) =>
+                updateSetting(
+                  'alertThreshold',
+                  e.target.value as AppSettings['alertThreshold'],
+                )
+              }
+              className="w-full px-3 py-2 rounded-lg bg-slate-950 border border-slate-700 text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-400"
             >
               <option value="all">All Alerts</option>
               <option value="advisory">Advisory & Above</option>
@@ -168,63 +197,66 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
           </div>
         </section>
 
-        {/* Section 2: Units of Measurement */}
         <section className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-4">
           <div className="flex items-center gap-2 text-sm font-semibold text-white">
             <Gauge className="w-4 h-4 text-violet-400" />
             <span>Measurement Units</span>
           </div>
 
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-xs font-medium text-slate-200">Unit System</p>
-              <p className="text-[11px] text-slate-400">
-                Distance, elevation, and plume height units
-              </p>
-            </div>
-            <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-950 border border-slate-800">
-              <button
-                type="button"
-                onClick={() => updateSetting('unitSystem', 'metric')}
-                className={`px-3 py-1 rounded-lg text-xs font-medium transition ${
-                  settings.unitSystem === 'metric'
-                    ? 'bg-violet-500/25 text-violet-300 border border-violet-400/30'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                Metric (km, m)
-              </button>
-              <button
-                type="button"
-                onClick={() => updateSetting('unitSystem', 'imperial')}
-                className={`px-3 py-1 rounded-lg text-xs font-medium transition ${
-                  settings.unitSystem === 'imperial'
-                    ? 'bg-violet-500/25 text-violet-300 border border-violet-400/30'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                Imperial (mi, ft)
-              </button>
-            </div>
+          <div>
+            <p className="text-xs font-medium text-slate-200">
+              Unit System
+            </p>
+            <p className="text-[11px] text-slate-400 mt-0.5">
+              Saved preference. Other screens may still use their default units.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              aria-pressed={settings.unitSystem === 'metric'}
+              onClick={() => updateSetting('unitSystem', 'metric')}
+              className={`px-3 py-2 rounded-lg text-xs font-medium transition ${
+                settings.unitSystem === 'metric'
+                  ? 'bg-violet-500/25 text-violet-300 border border-violet-400/30'
+                  : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              Metric (km, m)
+            </button>
+            <button
+              type="button"
+              aria-pressed={settings.unitSystem === 'imperial'}
+              onClick={() => updateSetting('unitSystem', 'imperial')}
+              className={`px-3 py-2 rounded-lg text-xs font-medium transition ${
+                settings.unitSystem === 'imperial'
+                  ? 'bg-violet-500/25 text-violet-300 border border-violet-400/30'
+                  : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              Imperial (mi, ft)
+            </button>
           </div>
         </section>
 
-        {/* Section 3: Telemetry Diagnostics Empty State */}
         <section className="space-y-3">
           <EmptyState
             icon={Activity}
-            badge="Diagnostic Telemetry Standby"
-            title="Data Pipeline Not Connected Yet"
-            description="The client settings engine and persistent storage are operational. Ingest endpoints for live seismic streaming, real-time alert webhooks, and satellite overpasses are not connected in Phase 1."
-            secondaryInfo="Upstream Connection Target: /api/v1/telemetry (Status: Unconnected in Phase 1 Baseline)."
-            actionText="Run Diagnostic Probe"
-            onAction={() => setDiagnosticsMessage('Diagnostics: HTTP 200 Client OK. Upstream streaming endpoint is awaiting Phase 2 configuration.')}
+            badge="Local Diagnostics"
+            title="Browser Storage Check"
+            description="Check whether saved settings can be read and parsed in this browser. This does not test a remote API or live telemetry."
+            actionText="Run Storage Check"
+            onAction={handleRunDiagnostics}
             secondaryActionText="Reset Settings"
             onSecondaryAction={handleResetDefaults}
           />
 
           {diagnosticsMessage && (
-            <div className="p-3.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-cyan-300 font-mono">
+            <div
+              role="status"
+              className="p-3.5 rounded-xl bg-slate-900 border border-slate-700 text-xs text-cyan-300"
+            >
               {diagnosticsMessage}
             </div>
           )}
