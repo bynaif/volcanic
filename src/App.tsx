@@ -3,31 +3,29 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AppRoute, MainRoute } from './types';
 import { Header } from './components/Header';
 import { Navbar } from './components/Navbar';
 import { OfflineIndicator } from './components/OfflineIndicator';
 
-// Pages
-import { HomePage } from './pages/HomePage';
-import { LiveMapPage } from './pages/LiveMapPage';
-import { AlertsPage } from './pages/AlertsPage';
-import { NewsPage } from './pages/NewsPage';
-import { MorePage } from './pages/MorePage';
+// Lazy-loaded pages reduce the initial JavaScript bundle.
+const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.HomePage })));
+const LiveMapPage = lazy(() => import('./pages/LiveMapPage').then(m => ({ default: m.LiveMapPage })));
+const AlertsPage = lazy(() => import('./pages/AlertsPage').then(m => ({ default: m.AlertsPage })));
+const NewsPage = lazy(() => import('./pages/NewsPage').then(m => ({ default: m.NewsPage })));
+const MorePage = lazy(() => import('./pages/MorePage').then(m => ({ default: m.MorePage })));
 
-// More sub-pages
-import { VolcanoSearchPage } from './pages/more/VolcanoSearchPage';
-import { ReportsPage } from './pages/more/ReportsPage';
-import { TravelSafetyPage } from './pages/more/TravelSafetyPage';
-import { SheltersPage } from './pages/more/SheltersPage';
-import { DonationsPage } from './pages/more/DonationsPage';
-import { SettingsPage } from './pages/more/SettingsPage';
-import { HelpPage } from './pages/more/HelpPage';
+const VolcanoSearchPage = lazy(() => import('./pages/more/VolcanoSearchPage').then(m => ({ default: m.VolcanoSearchPage })));
+const ReportsPage = lazy(() => import('./pages/more/ReportsPage').then(m => ({ default: m.ReportsPage })));
+const TravelSafetyPage = lazy(() => import('./pages/more/TravelSafetyPage').then(m => ({ default: m.TravelSafetyPage })));
+const SheltersPage = lazy(() => import('./pages/more/SheltersPage').then(m => ({ default: m.SheltersPage })));
+const DonationsPage = lazy(() => import('./pages/more/DonationsPage').then(m => ({ default: m.DonationsPage })));
+const SettingsPage = lazy(() => import('./pages/more/SettingsPage').then(m => ({ default: m.SettingsPage })));
+const HelpPage = lazy(() => import('./pages/more/HelpPage').then(m => ({ default: m.HelpPage })));
+const VolcanoDetailPage = lazy(() => import('./pages/VolcanoDetailPage').then(m => ({ default: m.VolcanoDetailPage })));
 
-// Volcano Detail Page
-import { VolcanoDetailPage } from './pages/VolcanoDetailPage';
 import { WELL_KNOWN_VOLCANOES } from './data/volcanoes';
 
 function parseHashToRoute(): AppRoute {
@@ -172,7 +170,15 @@ export default function App() {
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.18, ease: 'easeOut' }}
             >
-              {renderActivePage()}
+              <Suspense
+                fallback={
+                  <div className="flex min-h-[40vh] items-center justify-center text-cyan-300">
+                    Loading...
+                  </div>
+                }
+              >
+                {renderActivePage()}
+              </Suspense>
             </motion.div>
           </AnimatePresence>
         </main>
