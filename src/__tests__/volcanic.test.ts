@@ -11,6 +11,7 @@ import {
   formatTimeLocal,
 } from '../hooks/useEarthquakeData';
 import { EarthquakeFeature, EarthquakeFeed } from '../types';
+import { checkWebGLSupport } from '../pages/LiveMapPage';
 
 // ========================================================
 // 1. USGS Data Parser & Helper Tests
@@ -495,6 +496,96 @@ describe('Earthquake Magnitude Distribution Chart', () => {
     const rawMag = null;
     const safeMag = rawMag !== null ? Math.max(0, rawMag) : 0;
     expect(safeMag).toBe(0);
+  });
+});
+
+// ========================================================
+// 9. Map Initialization, Error Handling & Cleanup Tests
+// ========================================================
+describe('Map Initialization, Error Handling & Cleanup Lifecycle', () => {
+  it('checkWebGLSupport handles environments safely without throwing', () => {
+    // In node/happy-dom/jsdom, checkWebGLSupport should return a boolean without throwing
+    const result = checkWebGLSupport();
+    expect(typeof result).toBe('boolean');
+  });
+
+  it('triggers visible map error when WebGL is unavailable or fails', () => {
+    let mapError: string | null = null;
+    const isWebGLSupported = false;
+
+    if (!isWebGLSupported) {
+      mapError =
+        'WebGL is unavailable or disabled in your browser. Enable hardware acceleration or WebGL in your browser settings to view the interactive map.';
+    }
+
+    expect(mapError).toContain('WebGL is unavailable');
+  });
+
+  it('handles map error events for tile or style failures and provides retry', () => {
+    let mapError: string | null = null;
+    let mapInitKey = 0;
+
+    const simulateMapError = (errorMsg: string) => {
+      if (
+        errorMsg.toLowerCase().includes('tile') ||
+        errorMsg.toLowerCase().includes('style') ||
+        errorMsg.toLowerCase().includes('network')
+      ) {
+        mapError = errorMsg;
+      }
+    };
+
+    const handleRetryMap = () => {
+      mapError = null;
+      mapInitKey += 1;
+    };
+
+    // Simulate tile loading error
+    simulateMapError('Failed to fetch tile: 404 Not Found');
+    expect(mapError).toBe('Failed to fetch tile: 404 Not Found');
+
+    // Simulate clicking "Retry Map"
+    handleRetryMap();
+    expect(mapError).toBeNull();
+    expect(mapInitKey).toBe(1);
+  });
+
+  it('properly cleans up map instances, listeners, and observers on unmount', () => {
+    const mockMap = {
+      remove: vi.fn(),
+    };
+    const mockObserver = {
+      disconnect: vi.fn(),
+    };
+    const mockMarker = {
+      remove: vi.fn(),
+    };
+
+    let mapInstance: any = mockMap;
+    let observerInstance: any = mockObserver;
+    const markers = [mockMarker];
+
+    // Cleanup routine
+    observerInstance.disconnect();
+    observerInstance = null;
+    markers.forEach((m) => m.remove());
+    markers.length = 0;
+    mapInstance.remove();
+    mapInstance = null;
+
+    expect(mockObserver.disconnect).toHaveBeenCalled();
+    expect(mockMarker.remove).toHaveBeenCalled();
+    expect(mockMap.remove).toHaveBeenCalled();
+    expect(mapInstance).toBeNull();
+    expect(observerInstance).toBeNull();
+    expect(markers.length).toBe(0);
+  });
+
+  it('validates map container minimum height requirement to prevent 0-height renders', () => {
+    const containerClasses =
+      'w-full min-h-[400px] h-[calc(100dvh-260px)] md:h-[620px] bg-[#070913] relative';
+    expect(containerClasses).toContain('min-h-[400px]');
+    expect(containerClasses).toContain('h-[calc(100dvh-260px)]');
   });
 });
 

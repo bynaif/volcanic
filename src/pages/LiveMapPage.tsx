@@ -44,7 +44,7 @@ const OPENFREEMAP_DARK_STYLE = 'https://tiles.openfreemap.org/styles/dark';
 /**
  * Checks whether WebGL / hardware acceleration is available in the browser.
  */
-function checkWebGLSupport(): boolean {
+export function checkWebGLSupport(): boolean {
   if (typeof window === 'undefined') return true;
   try {
     const canvas = document.createElement('canvas');
