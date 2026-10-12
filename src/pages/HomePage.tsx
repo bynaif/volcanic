@@ -22,6 +22,7 @@ import {
 import { DataCardHeader } from '../components/DataCardHeader';
 import { DataErrorState } from '../components/DataErrorState';
 import { EarthquakeSkeleton } from '../components/EarthquakeSkeleton';
+import { EarthquakeMagnitudeChart } from '../components/EarthquakeMagnitudeChart';
 
 interface HomePageProps {
   onNavigate: (route: AppRoute) => void;
@@ -176,6 +177,13 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
           </div>
         )}
       </section>
+
+      {/* Magnitude Distribution Trend Chart (10 most recent earthquakes) */}
+      {!error && latestTenQuakes.length > 0 && (
+        <section aria-label="Magnitude trend visualization">
+          <EarthquakeMagnitudeChart quakes={latestTenQuakes} />
+        </section>
+      )}
 
       {/* Feature Modules Quick Access */}
       <section aria-label="Feature modules">

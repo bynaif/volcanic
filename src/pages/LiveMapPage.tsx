@@ -12,6 +12,7 @@ import {
   Clock,
   Compass,
   AlertTriangle,
+  RefreshCw,
   ZoomIn,
   ZoomOut,
   Maximize2,
@@ -40,6 +41,23 @@ type MinMagFilter = 'all' | '2.5' | '4.5';
 
 const OPENFREEMAP_DARK_STYLE = 'https://tiles.openfreemap.org/styles/dark';
 
+/**
+ * Checks whether WebGL / hardware acceleration is available in the browser.
+ */
+function checkWebGLSupport(): boolean {
+  if (typeof window === 'undefined') return true;
+  try {
+    const canvas = document.createElement('canvas');
+    const gl =
+      canvas.getContext('webgl2') ||
+      canvas.getContext('webgl') ||
+      canvas.getContext('experimental-webgl');
+    return !!gl;
+  } catch (_e) {
+    return false;
+  }
+}
+
 export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
   const { data, loading, error, refetch, feedGenerated, fetchTime } = useEarthquakeData();
 
@@ -47,6 +65,9 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
   const [selectedQuake, setSelectedQuake] = useState<EarthquakeFeature | null>(null);
   const [isLocating, setIsLocating] = useState(false);
   const [geoNotice, setGeoNotice] = useState<string | null>(null);
+  const [currentZoom, setCurrentZoom] = useState<number>(1.6);
+  const [mapError, setMapError] = useState<string | null>(null);
+  const [mapInitKey, setMapInitKey] = useState<number>(0);
 
   // Volcano Map Search
   const [volcanoSearchQuery, setVolcanoSearchQuery] = useState('');
@@ -56,6 +77,7 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
   const mapRef = useRef<maplibregl.Map | null>(null);
   const userMarkerRef = useRef<maplibregl.Marker | null>(null);
   const volcanoMarkersRef = useRef<maplibregl.Marker[]>([]);
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
 
   // Filter earthquakes according to selected minimum magnitude
   const filteredFeatures = useMemo(() => {
@@ -68,6 +90,22 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
     }
     return data.features;
   }, [data, minMag]);
+
+  const filteredFeaturesRef = useRef(filteredFeatures);
+  useEffect(() => {
+    filteredFeaturesRef.current = filteredFeatures;
+  }, [filteredFeatures]);
+
+  const handleRetryMap = () => {
+    setMapError(null);
+    if (mapRef.current) {
+      try {
+        mapRef.current.remove();
+      } catch (_e) {}
+      mapRef.current = null;
+    }
+    setMapInitKey((prev) => prev + 1);
+  };
 
   // Counts for each tier
   const stats = useMemo(() => {
@@ -111,10 +149,28 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
 
   // Initialize MapLibre GL
   useEffect(() => {
+    // 4. Ensure map is initialised only after the container ref exists
     if (!mapContainerRef.current) return;
 
-    if (!mapRef.current) {
-      const map = new maplibregl.Map({
+    // Clean up any existing map instance before creating a new one
+    if (mapRef.current) {
+      try {
+        mapRef.current.remove();
+      } catch (_e) {}
+      mapRef.current = null;
+    }
+
+    // 3. WebGL availability check
+    if (!checkWebGLSupport()) {
+      setMapError(
+        'WebGL is unavailable or disabled in your browser. Enable hardware acceleration or WebGL in your browser settings to view the interactive map.'
+      );
+      return;
+    }
+
+    let map: maplibregl.Map;
+    try {
+      map = new maplibregl.Map({
         container: mapContainerRef.current,
         style: OPENFREEMAP_DARK_STYLE,
         center: [0, 20],
@@ -123,184 +179,260 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
         minZoom: 1,
         attributionControl: false,
       });
-
-      map.addControl(
-        new maplibregl.AttributionControl({
-          compact: true,
-          customAttribution: '© OpenFreeMap | © OpenStreetMap | USGS | Smithsonian GVP',
-        }),
-        'bottom-right'
+    } catch (err: any) {
+      console.error('Failed to initialize MapLibre GL:', err);
+      setMapError(
+        err?.message ||
+          'Failed to initialize the map graphics context. Please verify WebGL support and try again.'
       );
+      return;
+    }
 
-      map.addControl(new maplibregl.NavigationControl({ showCompass: true }), 'top-right');
+    // 3. Handle map errors: listen to the map 'error' event
+    map.on('error', (e: any) => {
+      console.error('MapLibre GL error event:', e);
+      const errMsg =
+        e.error?.message ||
+        (typeof e.error === 'string' ? e.error : '') ||
+        (e.status ? `Map error (status ${e.status})` : '');
 
-      map.on('load', () => {
-        // Add Volcano Triangle HTML Markers
-        volcanoMarkersRef.current.forEach((m) => m.remove());
-        volcanoMarkersRef.current = [];
+      if (
+        !map.isStyleLoaded() ||
+        errMsg.toLowerCase().includes('tile') ||
+        errMsg.toLowerCase().includes('style') ||
+        errMsg.toLowerCase().includes('webgl') ||
+        errMsg.toLowerCase().includes('failed to fetch') ||
+        errMsg.toLowerCase().includes('network')
+      ) {
+        setMapError(
+          errMsg ||
+            'Unable to load map style or tiles. Please check your network connection and try again.'
+        );
+      }
+    });
 
-        WELL_KNOWN_VOLCANOES.forEach((volcano) => {
-          const el = document.createElement('div');
-          el.className = 'group volcano-marker-pin cursor-pointer select-none';
-          el.style.zIndex = '15';
-          el.innerHTML = `
-            <div style="display: flex; flex-direction: column; align-items: center; transform: translate(-50%, -100%);">
-              <div style="background: #090d20; border: 2px solid #00f0ff; box-shadow: 0 0 12px rgba(0, 240, 255, 0.6); border-radius: 8px; padding: 3px 5px; display: flex; align-items: center; justify-content: center; transition: transform 0.2s ease;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="#00f0ff" stroke="#ffffff" stroke-width="1.5">
-                  <polygon points="12,2 22,21 2,21" />
-                </svg>
-              </div>
-              <div style="width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 5px solid #00f0ff;"></div>
+    map.addControl(
+      new maplibregl.AttributionControl({
+        compact: true,
+        customAttribution: '© OpenFreeMap | © OpenStreetMap | USGS | Smithsonian GVP',
+      }),
+      'bottom-right'
+    );
+
+    // Track zoom level changes
+    map.on('zoom', () => {
+      setCurrentZoom(map.getZoom());
+    });
+
+    // 4. Earthquake and volcano layers added inside map.on('load')
+    map.on('load', () => {
+      // Clear any prior markers
+      volcanoMarkersRef.current.forEach((m) => m.remove());
+      volcanoMarkersRef.current = [];
+
+      WELL_KNOWN_VOLCANOES.forEach((volcano) => {
+        const el = document.createElement('div');
+        el.className = 'group volcano-marker-pin cursor-pointer select-none';
+        el.style.zIndex = '15';
+        el.innerHTML = `
+          <div style="display: flex; flex-direction: column; align-items: center; transform: translate(-50%, -100%);">
+            <div style="background: #090d20; border: 2px solid #00f0ff; box-shadow: 0 0 12px rgba(0, 240, 255, 0.6); border-radius: 8px; padding: 3px 5px; display: flex; align-items: center; justify-content: center; transition: transform 0.2s ease;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#00f0ff" stroke="#ffffff" stroke-width="1.5">
+                <polygon points="12,2 22,21 2,21" />
+              </svg>
             </div>
-          `;
+            <div style="width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 5px solid #00f0ff;"></div>
+          </div>
+        `;
 
-          el.addEventListener('click', (e) => {
-            e.stopPropagation();
-            onNavigate(`volcano/${volcano.id}` as AppRoute);
-          });
-
-          const marker = new maplibregl.Marker({ element: el, anchor: 'bottom' })
-            .setLngLat([volcano.longitude, volcano.latitude])
-            .addTo(map);
-
-          volcanoMarkersRef.current.push(marker);
+        el.addEventListener('click', (e) => {
+          e.stopPropagation();
+          onNavigate(`volcano/${volcano.id}` as AppRoute);
         });
 
-        // Add GeoJSON source for earthquakes
-        map.addSource('usgs-earthquakes', {
-          type: 'geojson',
-          data: {
-            type: 'FeatureCollection',
-            features: [],
+        const marker = new maplibregl.Marker({ element: el, anchor: 'bottom' })
+          .setLngLat([volcano.longitude, volcano.latitude])
+          .addTo(map);
+
+        volcanoMarkersRef.current.push(marker);
+      });
+
+      // Add GeoJSON source for earthquakes (initialise with latest features if available)
+      map.addSource('usgs-earthquakes', {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: (filteredFeaturesRef.current || []) as any,
+        },
+      });
+
+      // Layer: Outer halo glow for earthquakes
+      map.addLayer({
+        id: 'earthquake-glow',
+        type: 'circle',
+        source: 'usgs-earthquakes',
+        paint: {
+          'circle-radius': [
+            'interpolate',
+            ['linear'],
+            ['coalesce', ['get', 'mag'], 1],
+            0, 8,
+            2.5, 14,
+            4.5, 24,
+            6.5, 38,
+          ],
+          'circle-color': [
+            'step',
+            ['coalesce', ['get', 'mag'], 1],
+            '#00f0ff', // < 2.5
+            2.5, '#f59e0b', // 2.5 - 4.5
+            4.5, '#f97316', // 4.5 - 6.0
+            6.0, '#f43f5e', // >= 6.0
+          ],
+          'circle-opacity': 0.25,
+          'circle-blur': 0.6,
+        },
+      });
+
+      // Layer: Solid circle marker for earthquakes
+      map.addLayer({
+        id: 'earthquake-circles',
+        type: 'circle',
+        source: 'usgs-earthquakes',
+        paint: {
+          'circle-radius': [
+            'interpolate',
+            ['linear'],
+            ['coalesce', ['get', 'mag'], 1],
+            0, 4,
+            2.5, 7,
+            4.5, 12,
+            6.5, 20,
+          ],
+          'circle-color': [
+            'step',
+            ['coalesce', ['get', 'mag'], 1],
+            '#00f0ff', // < 2.5
+            2.5, '#f59e0b', // 2.5 - 4.5
+            4.5, '#f97316', // 4.5 - 6.0
+            6.0, '#f43f5e', // >= 6.0
+          ],
+          'circle-stroke-width': 1.5,
+          'circle-stroke-color': '#ffffff',
+          'circle-stroke-opacity': 0.85,
+        },
+      });
+
+      // Click handler on earthquake marker
+      map.on('click', 'earthquake-circles', (e: any) => {
+        if (!e.features || e.features.length === 0) return;
+        const clickedFeature = e.features[0];
+        const coords = (clickedFeature.geometry as any)?.coordinates || [0, 0, 0];
+        const lng = coords[0];
+        const lat = coords[1];
+        const depth = coords[2] ?? 0;
+
+        const props = clickedFeature.properties as any;
+        const fullFeature: EarthquakeFeature = {
+          type: 'Feature',
+          id: String(clickedFeature.id || props.code || Math.random()),
+          properties: {
+            mag: typeof props.mag === 'number' ? props.mag : parseFloat(props.mag),
+            place: props.place,
+            time: typeof props.time === 'number' ? props.time : parseInt(props.time, 10),
+            updated: typeof props.updated === 'number' ? props.updated : parseInt(props.updated, 10),
+            tz: null,
+            url: props.url,
+            detail: props.detail || '',
+            felt: null,
+            cdi: null,
+            mmi: null,
+            alert: props.alert || null,
+            status: props.status || '',
+            tsunami: props.tsunami || 0,
+            sig: props.sig || 0,
+            net: props.net || '',
+            code: props.code || '',
+            ids: props.ids || '',
+            sources: props.sources || '',
+            types: props.types || '',
+            nst: null,
+            dmin: null,
+            rms: null,
+            gap: null,
+            magType: props.magType || '',
+            type: props.type || 'earthquake',
+            title: props.title || '',
           },
-        });
-
-        // Layer: Outer halo glow for earthquakes
-        map.addLayer({
-          id: 'earthquake-glow',
-          type: 'circle',
-          source: 'usgs-earthquakes',
-          paint: {
-            'circle-radius': [
-              'interpolate',
-              ['linear'],
-              ['coalesce', ['get', 'mag'], 1],
-              0, 8,
-              2.5, 14,
-              4.5, 24,
-              6.5, 38,
-            ],
-            'circle-color': [
-              'step',
-              ['coalesce', ['get', 'mag'], 1],
-              '#00f0ff', // < 2.5
-              2.5, '#f59e0b', // 2.5 - 4.5
-              4.5, '#f97316', // 4.5 - 6.0
-              6.0, '#f43f5e', // >= 6.0
-            ],
-            'circle-opacity': 0.25,
-            'circle-blur': 0.6,
+          geometry: {
+            type: 'Point',
+            coordinates: [lng, lat, depth],
           },
-        });
+        };
 
-        // Layer: Solid circle marker for earthquakes
-        map.addLayer({
-          id: 'earthquake-circles',
-          type: 'circle',
-          source: 'usgs-earthquakes',
-          paint: {
-            'circle-radius': [
-              'interpolate',
-              ['linear'],
-              ['coalesce', ['get', 'mag'], 1],
-              0, 4,
-              2.5, 7,
-              4.5, 12,
-              6.5, 20,
-            ],
-            'circle-color': [
-              'step',
-              ['coalesce', ['get', 'mag'], 1],
-              '#00f0ff', // < 2.5
-              2.5, '#f59e0b', // 2.5 - 4.5
-              4.5, '#f97316', // 4.5 - 6.0
-              6.0, '#f43f5e', // >= 6.0
-            ],
-            'circle-stroke-width': 1.5,
-            'circle-stroke-color': '#ffffff',
-            'circle-stroke-opacity': 0.85,
-          },
-        });
+        setSelectedQuake(fullFeature);
 
-        // Click handler on earthquake marker
-        map.on('click', 'earthquake-circles', (e: any) => {
-          if (!e.features || e.features.length === 0) return;
-          const clickedFeature = e.features[0];
-          const coords = (clickedFeature.geometry as any)?.coordinates || [0, 0, 0];
-          const lng = coords[0];
-          const lat = coords[1];
-          const depth = coords[2] ?? 0;
-
-          const props = clickedFeature.properties as any;
-          const fullFeature: EarthquakeFeature = {
-            type: 'Feature',
-            id: String(clickedFeature.id || props.code || Math.random()),
-            properties: {
-              mag: typeof props.mag === 'number' ? props.mag : parseFloat(props.mag),
-              place: props.place,
-              time: typeof props.time === 'number' ? props.time : parseInt(props.time, 10),
-              updated: typeof props.updated === 'number' ? props.updated : parseInt(props.updated, 10),
-              tz: null,
-              url: props.url,
-              detail: props.detail || '',
-              felt: null,
-              cdi: null,
-              mmi: null,
-              alert: props.alert || null,
-              status: props.status || '',
-              tsunami: props.tsunami || 0,
-              sig: props.sig || 0,
-              net: props.net || '',
-              code: props.code || '',
-              ids: props.ids || '',
-              sources: props.sources || '',
-              types: props.types || '',
-              nst: null,
-              dmin: null,
-              rms: null,
-              gap: null,
-              magType: props.magType || '',
-              type: props.type || 'earthquake',
-              title: props.title || '',
-            },
-            geometry: {
-              type: 'Point',
-              coordinates: [lng, lat, depth],
-            },
-          };
-
-          setSelectedQuake(fullFeature);
-
-          map.flyTo({
-            center: [lng, lat],
-            zoom: Math.max(map.getZoom(), 4.5),
-            speed: 1.2,
-          });
-        });
-
-        map.on('mouseenter', 'earthquake-circles', () => {
-          map.getCanvas().style.cursor = 'pointer';
-        });
-        map.on('mouseleave', 'earthquake-circles', () => {
-          map.getCanvas().style.cursor = '';
+        map.flyTo({
+          center: [lng, lat],
+          zoom: Math.max(map.getZoom(), 4.5),
+          speed: 1.2,
         });
       });
 
-      mapRef.current = map;
+      map.on('mouseenter', 'earthquake-circles', () => {
+        map.getCanvas().style.cursor = 'pointer';
+      });
+      map.on('mouseleave', 'earthquake-circles', () => {
+        map.getCanvas().style.cursor = '';
+      });
+
+      // 2. Call map.resize() on load
+      map.resize();
+    });
+
+    mapRef.current = map;
+
+    // 2. Call map.resize() after mount and after small timeouts for layout settling
+    map.resize();
+    const timer1 = setTimeout(() => {
+      if (mapRef.current) mapRef.current.resize();
+    }, 100);
+    const timer2 = setTimeout(() => {
+      if (mapRef.current) mapRef.current.resize();
+    }, 350);
+
+    // 2. Call map.resize() when container resizes
+    if (typeof ResizeObserver !== 'undefined' && mapContainerRef.current) {
+      const resizeObserver = new ResizeObserver(() => {
+        if (mapRef.current) {
+          mapRef.current.resize();
+        }
+      });
+      resizeObserver.observe(mapContainerRef.current);
+      resizeObserverRef.current = resizeObserver;
     }
 
-    return () => {};
-  }, [onNavigate]);
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      if (resizeObserverRef.current) {
+        resizeObserverRef.current.disconnect();
+        resizeObserverRef.current = null;
+      }
+      volcanoMarkersRef.current.forEach((m) => m.remove());
+      volcanoMarkersRef.current = [];
+      if (userMarkerRef.current) {
+        userMarkerRef.current.remove();
+        userMarkerRef.current = null;
+      }
+      if (mapRef.current) {
+        try {
+          mapRef.current.remove();
+        } catch (_e) {}
+        mapRef.current = null;
+      }
+    };
+  }, [onNavigate, mapInitKey]);
 
   // Update GeoJSON source when features change
   useEffect(() => {
@@ -380,6 +512,33 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
       // Handles synchronous exceptions (e.g. frame security error or permissions policy violation)
       setIsLocating(false);
       setGeoNotice('Location unavailable. Allow location access in your browser settings and try again');
+    }
+  };
+
+  // Custom Zoom Controls Handlers (styled dark theme & touch accessible)
+  const handleZoomIn = () => {
+    const map = mapRef.current;
+    if (map) {
+      map.zoomIn({ duration: 300 });
+    }
+  };
+
+  const handleZoomOut = () => {
+    const map = mapRef.current;
+    if (map) {
+      map.zoomOut({ duration: 300 });
+    }
+  };
+
+  const handleResetZoom = () => {
+    const map = mapRef.current;
+    if (map) {
+      map.flyTo({
+        center: [0, 20],
+        zoom: 1.6,
+        essential: true,
+        speed: 1.2,
+      });
     }
   };
 
@@ -535,17 +694,106 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
       )}
 
       {/* Map Container */}
-      <div className="relative rounded-2xl border border-slate-800 overflow-hidden shadow-2xl bg-[#070913]">
+      <div
+        className="relative rounded-2xl border border-slate-800 overflow-hidden shadow-2xl bg-[#070913] min-h-[400px]"
+        style={{ minHeight: '400px' }}
+      >
+        {/* 3. Visible Error State with Retry Button for Tile/Style/WebGL failures */}
+        {mapError && (
+          <div
+            role="alert"
+            aria-live="assertive"
+            className="absolute inset-0 z-30 bg-[#070913]/95 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center space-y-4"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 shadow-lg shadow-rose-950/40">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <div className="max-w-md space-y-1.5">
+              <h3 className="text-base font-semibold text-white">Map Failed to Load</h3>
+              <p className="text-xs text-slate-300 leading-relaxed font-sans">{mapError}</p>
+            </div>
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={handleRetryMap}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-semibold shadow-lg shadow-cyan-950/50 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+                <span>Retry Map</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setMapError(null)}
+                className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition cursor-pointer"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        )}
+
         {loading && !data && (
           <div className="absolute inset-0 z-20 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 space-y-3">
             <EarthquakeSkeleton type="map" />
           </div>
         )}
 
+        {/* 2. Map container with explicit non-zero height on mobile and desktop */}
         <div
           ref={mapContainerRef}
-          className="w-full h-[450px] sm:h-[540px] md:h-[620px] bg-[#070913]"
+          className="w-full min-h-[400px] h-[calc(100dvh-260px)] md:h-[620px] bg-[#070913] relative"
+          style={{ minHeight: '400px', height: '100%' }}
         />
+
+        {/* Custom MapLibre GL Zoom & View Controls (styled dark theme & touch-accessible) */}
+        <div
+          role="toolbar"
+          aria-label="Map Zoom and View Controls"
+          className="absolute top-4 right-4 z-10 flex flex-col items-center bg-[#090d20]/90 backdrop-blur-md border border-slate-700/80 rounded-2xl p-1.5 shadow-2xl space-y-1.5 select-none"
+        >
+          {/* Zoom In Button */}
+          <button
+            type="button"
+            onClick={handleZoomIn}
+            aria-label="Zoom in on map"
+            title="Zoom In"
+            className="w-11 h-11 sm:w-10 sm:h-10 rounded-xl bg-slate-900/80 hover:bg-cyan-500/20 active:bg-cyan-500/30 text-slate-200 hover:text-cyan-300 border border-slate-700/50 hover:border-cyan-400/40 flex items-center justify-center transition-all shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+          >
+            <ZoomIn className="w-5 h-5 sm:w-4 sm:h-4" />
+          </button>
+
+          {/* Zoom Out Button */}
+          <button
+            type="button"
+            onClick={handleZoomOut}
+            aria-label="Zoom out of map"
+            title="Zoom Out"
+            className="w-11 h-11 sm:w-10 sm:h-10 rounded-xl bg-slate-900/80 hover:bg-cyan-500/20 active:bg-cyan-500/30 text-slate-200 hover:text-cyan-300 border border-slate-700/50 hover:border-cyan-400/40 flex items-center justify-center transition-all shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+          >
+            <ZoomOut className="w-5 h-5 sm:w-4 sm:h-4" />
+          </button>
+
+          <div className="w-6 h-px bg-slate-800" />
+
+          {/* Reset Zoom / Global View */}
+          <button
+            type="button"
+            onClick={handleResetZoom}
+            aria-label="Reset map view to global extent"
+            title="Reset to Global View"
+            className="w-11 h-11 sm:w-10 sm:h-10 rounded-xl bg-slate-900/80 hover:bg-cyan-500/20 active:bg-cyan-500/30 text-slate-200 hover:text-cyan-300 border border-slate-700/50 hover:border-cyan-400/40 flex items-center justify-center transition-all shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+          >
+            <Maximize2 className="w-4 h-4 text-slate-300 hover:text-cyan-300" />
+          </button>
+
+          {/* Zoom level indicator badge */}
+          <div
+            aria-label={`Current map zoom level ${currentZoom.toFixed(1)}`}
+            className="px-1.5 py-0.5 text-[10px] font-mono font-medium text-slate-400 border border-slate-800 rounded-md bg-slate-950/70"
+          >
+            {currentZoom.toFixed(1)}x
+          </div>
+        </div>
 
         {/* Map Legend Overlay */}
         <div className="absolute bottom-4 left-4 z-10 p-3 rounded-xl bg-slate-950/85 backdrop-blur-md border border-slate-800 text-[11px] font-mono space-y-1.5 shadow-xl pointer-events-auto">

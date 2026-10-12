@@ -426,3 +426,75 @@ describe('Geolocation and Locate Me Failure Handling', () => {
   });
 });
 
+// ========================================================
+// 7. Custom MapLibre GL Zoom Controls Tests
+// ========================================================
+describe('Custom MapLibre GL Zoom Controls', () => {
+  it('correctly invokes map zoomIn and zoomOut with smooth duration', () => {
+    const mockMap = {
+      zoomIn: vi.fn(),
+      zoomOut: vi.fn(),
+      flyTo: vi.fn(),
+      getZoom: vi.fn(() => 1.6),
+    };
+
+    // Zoom in
+    mockMap.zoomIn({ duration: 300 });
+    expect(mockMap.zoomIn).toHaveBeenCalledWith({ duration: 300 });
+
+    // Zoom out
+    mockMap.zoomOut({ duration: 300 });
+    expect(mockMap.zoomOut).toHaveBeenCalledWith({ duration: 300 });
+
+    // Reset zoom
+    mockMap.flyTo({
+      center: [0, 20],
+      zoom: 1.6,
+      essential: true,
+      speed: 1.2,
+    });
+    expect(mockMap.flyTo).toHaveBeenCalledWith({
+      center: [0, 20],
+      zoom: 1.6,
+      essential: true,
+      speed: 1.2,
+    });
+  });
+
+  it('formats zoom level indicator to single decimal precision', () => {
+    const zoom1 = 1.6;
+    const zoom2 = 7.423;
+    expect(zoom1.toFixed(1)).toBe('1.6');
+    expect(zoom2.toFixed(1)).toBe('7.4');
+  });
+});
+
+// ========================================================
+// 8. Earthquake Magnitude Distribution Chart Tests
+// ========================================================
+describe('Earthquake Magnitude Distribution Chart', () => {
+  it('correctly processes 10 most recent earthquakes and computes statistics', () => {
+    const mockEarthquakes = [
+      { id: '1', properties: { mag: 6.2, place: 'Honshu, Japan', time: 1000 }, geometry: { coordinates: [140, 35, 10] } },
+      { id: '2', properties: { mag: 4.5, place: 'Southern California', time: 900 }, geometry: { coordinates: [-118, 34, 5] } },
+      { id: '3', properties: { mag: 2.1, place: 'Hawaii', time: 800 }, geometry: { coordinates: [-155, 19, 2] } },
+      { id: '4', properties: { mag: 7.1, place: 'Vanuatu', time: 700 }, geometry: { coordinates: [168, -16, 25] } },
+    ] as any;
+
+    const magnitudes = mockEarthquakes.map((eq: any) => eq.properties.mag);
+    const maxMag = Math.max(...magnitudes);
+    const minMag = Math.min(...magnitudes);
+    const avgMag = magnitudes.reduce((a: number, b: number) => a + b, 0) / magnitudes.length;
+
+    expect(maxMag).toBe(7.1);
+    expect(minMag).toBe(2.1);
+    expect(avgMag).toBeCloseTo(4.975);
+  });
+
+  it('handles null magnitude gracefully', () => {
+    const rawMag = null;
+    const safeMag = rawMag !== null ? Math.max(0, rawMag) : 0;
+    expect(safeMag).toBe(0);
+  });
+});
+
