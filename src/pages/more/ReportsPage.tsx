@@ -1,117 +1,326 @@
-import React, { useState } from 'react';
+
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   FileText,
   ArrowLeft,
   ExternalLink,
-  ShieldAlert,
+  RefreshCw,
+  AlertTriangle,
+  Clock3,
 } from 'lucide-react';
 import { AppRoute } from '../../types';
-import { EmptyState } from '../../components/EmptyState';
 
 interface ReportsPageProps {
   onNavigate: (route: AppRoute) => void;
 }
 
-export const ReportsPage: React.FC<ReportsPageProps> = ({ onNavigate }) => {
-  const [notice, setNotice] = useState<string | null>(null);
+interface USGSNoticeSection {
+  vName?: string;
+  region?: string;
+  synopsis?: string;
+  alertLevel?: string;
+  colorCode?: string;
+  vUrl?: string;
+}
+
+interface USGSNotice {
+  noticeTitle?: string;
+  sentUtc?: string;
+  noticeId?: string;
+  noticeUrl?: string;
+  obsAlertLevel?: string;
+  obsColorCode?: string;
+  noticeSections?: USGSNoticeSection[];
+}
+
+const FEED_URL = 'https://volcanoes.usgs.gov/vsc/api/hansApi/newest';
+
+function formatDate(value?: string) {
+  if (!value) return 'Date unavailable';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return 'Date unavailable';
+
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(date);
+}
+
+export const ReportsPage: React.FC<ReportsPageProps> = ({
+  onNavigate,
+}) => {
+  const [notices, setNotices] = useState<USGSNotice[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  const loadReports = useCallback(async (manual = false) => {
+    if (manual) setRefreshing(true);
+    if (notices.length === 0) setLoading(true);
+
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 15000);
+
+    try {
+      const response = await fetch(FEED_URL, {
+        headers: { Accept: 'application/json' },
+        cache: 'no-store',
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        throw new Error(`USGS returned HTTP ${response.status}`);
+      }
+
+      const payload: unknown = await response.json();
+
+      if (!Array.isArray(payload)) {
+        throw new Error('Unexpected response from the USGS feed.');
+      }
+
+      const valid = (payload as USGSNotice[])
+        .filter(
+          (item) =>
+            item &&
+            typeof item === 'object' &&
+            (item.noticeTitle || item.noticeUrl),
+        )
+        .sort((a, b) =>
+          (b.sentUtc || '').localeCompare(a.sentUtc || ''),
+        );
+
+      setNotices(valid);
+      setLastUpdated(new Date());
+      setError(
+        valid.length === 0
+          ? 'The feed responded successfully, but no notices were returned.'
+          : null,
+      );
+    } catch (cause) {
+      setError(
+        cause instanceof Error && cause.name === 'AbortError'
+          ? 'The USGS feed timed out. Try again.'
+          : cause instanceof Error
+            ? `Unable to load reports: ${cause.message}`
+            : 'Unable to load reports.',
+      );
+    } finally {
+      window.clearTimeout(timeout);
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [notices.length]);
+
+  useEffect(() => {
+    void loadReports();
+
+    const interval = window.setInterval(
+      () => void loadReports(true),
+      5 * 60 * 1000,
+    );
+
+    return () => window.clearInterval(interval);
+  }, [loadReports]);
 
   return (
     <div className="space-y-6 pb-20 md:pb-8">
-      {/* Top Navigation */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <button
           onClick={() => onNavigate('more')}
-          className="inline-flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 font-medium transition"
+          className="inline-flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 font-medium"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to More</span>
+          Back to More
         </button>
-        <span className="text-xs font-mono text-amber-400">Reports Ingest Offline</span>
+
+        <span className="text-xs font-mono text-cyan-300">
+          USGS · HANS
+        </span>
       </div>
 
       <div>
         <h1 className="text-xl md:text-2xl font-bold tracking-tight text-white font-mono">
-          Geological Reports & Sensor Logs
+          Geological Reports & Notices
         </h1>
         <p className="text-xs text-slate-400 mt-1">
-          Observatory situation reports, satellite observations, and ground sensor records.
+          Official USGS Volcano Notification Service notices. These are
+          published advisories, not a complete global sensor feed.
         </p>
       </div>
 
-      {notice && (
-        <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300 flex items-center justify-between">
-          <span>{notice}</span>
+      <section className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="text-xs text-slate-400">
+            <p>Source: U.S. Geological Survey</p>
+            <p className="mt-1">
+              Last checked: {lastUpdated
+                ? formatDate(lastUpdated.toISOString())
+                : 'Not checked yet'}
+            </p>
+          </div>
+
           <button
-            onClick={() => setNotice(null)}
-            className="text-slate-400 hover:text-white px-2 py-0.5 text-xs"
+            type="button"
+            onClick={() => void loadReports(true)}
+            disabled={refreshing}
+            className="inline-flex items-center gap-2 rounded-xl border border-cyan-800 bg-cyan-950/50 px-3 py-2 text-xs text-cyan-200 disabled:opacity-50"
           >
-            Dismiss
+            <RefreshCw
+              className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`}
+            />
+            {refreshing ? 'Refreshing…' : 'Refresh reports'}
+          </button>
+        </div>
+      </section>
+
+      {error && (
+        <div
+          role="status"
+          className="rounded-xl border border-amber-700/40 bg-amber-950/20 p-4 text-sm text-amber-200"
+        >
+          <div className="flex items-start gap-2">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+            <div>
+              <p>{error}</p>
+              {notices.length > 0 && (
+                <p className="mt-1 text-xs text-amber-100/70">
+                  Previously loaded notices remain visible; they may be stale.
+                </p>
+              )}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => void loadReports(true)}
+            className="mt-3 underline underline-offset-4"
+          >
+            Try again
           </button>
         </div>
       )}
 
-      {/* Honest Empty State */}
-      <EmptyState
-        icon={FileText}
-        badge="Reports Ingest Not Connected"
-        title="Reports Feed Not Connected Yet"
-        description="Direct observatory situation reports and technical sensor feeds are not connected to this application. Access official bulletins directly through the authorized observatory portals below."
-        actionText="Test Ingest Status"
-        onAction={() => setNotice('Report feed ingest pipeline is not connected yet.')}
-        secondaryActionText="Return to More"
-        onSecondaryAction={() => onNavigate('more')}
-      />
+      {loading && notices.length === 0 ? (
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-8 text-center text-sm text-slate-300">
+          Loading official USGS notices…
+        </div>
+      ) : notices.length === 0 ? (
+        !error && (
+          <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-8 text-center text-sm text-slate-400">
+            No notices are currently available from this feed.
+          </div>
+        )
+      ) : (
+        <div className="space-y-3">
+          {notices.map((notice, index) => {
+            const sections = notice.noticeSections || [];
 
-      {/* Real External Sources Links */}
-      <section aria-label="Official observatory report portals" className="p-5 md:p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-3">
-        <h2 className="text-sm font-semibold text-white flex items-center gap-2">
-          <FileText className="w-4 h-4 text-blue-400" />
-          <span>Official Observatory Report Portals</span>
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
-          <a
-            href="https://www.usgs.gov/programs/VHP/volcano-activity-notices"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-blue-500/40 transition group block"
-          >
-            <div className="flex items-center justify-between text-blue-400 font-semibold mb-1">
-              <span>USGS VHP Notices</span>
-              <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-            </div>
-            <p className="text-slate-400 text-[11px]">
-              Daily & weekly volcanic activity notices for US volcanoes
-            </p>
-          </a>
+            return (
+              <article
+                key={notice.noticeId || notice.noticeUrl || `${notice.noticeTitle}-${index}`}
+                className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 md:p-5"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <h2 className="text-sm font-semibold leading-6 text-white">
+                    {notice.noticeTitle || 'USGS Volcano Notice'}
+                  </h2>
+                  <span className="shrink-0 rounded-lg border border-slate-700 bg-slate-950 px-2 py-1 text-[10px] text-slate-300">
+                    Official notice
+                  </span>
+                </div>
 
+                <p className="mt-2 flex items-center gap-1.5 text-xs text-slate-400">
+                  <Clock3 className="h-3.5 w-3.5" />
+                  Published: {formatDate(notice.sentUtc)}
+                </p>
+
+                {notice.obsAlertLevel && (
+                  <p className="mt-3 text-xs text-amber-300">
+                    Alert level: {notice.obsAlertLevel}
+                    {notice.obsColorCode
+                      ? ` · Aviation color: ${notice.obsColorCode}`
+                      : ''}
+                  </p>
+                )}
+
+                {sections.map((section, sectionIndex) => (
+                  <div
+                    key={`${section.vName || 'volcano'}-${sectionIndex}`}
+                    className="mt-4 border-t border-slate-800 pt-3"
+                  >
+                    <p className="text-xs font-semibold text-cyan-200">
+                      {section.vName || 'Volcano update'}
+                      {section.region ? ` · ${section.region}` : ''}
+                    </p>
+
+                    {section.alertLevel && (
+                      <p className="mt-1 text-xs text-amber-300">
+                        Alert level: {section.alertLevel}
+                        {section.colorCode
+                          ? ` · Aviation color: ${section.colorCode}`
+                          : ''}
+                      </p>
+                    )}
+
+                    {section.synopsis && (
+                      <p className="mt-2 whitespace-pre-line text-xs leading-5 text-slate-300">
+                        {section.synopsis}
+                      </p>
+                    )}
+
+                    {section.vUrl && (
+                      <a
+                        href={section.vUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 inline-flex items-center gap-1 text-xs text-cyan-300 hover:text-cyan-200"
+                      >
+                        Volcano details
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
+                  </div>
+                ))}
+
+                {notice.noticeUrl && (
+                  <a
+                    href={notice.noticeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-cyan-800/70 px-3 py-2 text-xs font-medium text-cyan-200 hover:bg-cyan-950/40"
+                  >
+                    Read original USGS notice
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                )}
+              </article>
+            );
+          })}
+        </div>
+      )}
+
+      <section className="rounded-2xl border border-slate-800 bg-slate-900/50 p-4">
+        <div className="flex items-center gap-2 text-sm font-semibold text-white">
+          <FileText className="h-4 w-4 text-cyan-300" />
+          More official reporting sources
+        </div>
+        <div className="mt-3 flex flex-wrap gap-3 text-xs">
           <a
             href="https://volcano.si.edu/reports_weekly.cfm"
             target="_blank"
             rel="noopener noreferrer"
-            className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-blue-500/40 transition group block"
+            className="text-cyan-300 hover:underline"
           >
-            <div className="flex items-center justify-between text-blue-400 font-semibold mb-1">
-              <span>Smithsonian GVP Reports</span>
-              <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-            </div>
-            <p className="text-slate-400 text-[11px]">
-              Weekly global volcanic activity summaries
-            </p>
+            Smithsonian GVP weekly reports
           </a>
-
           <a
-            href="https://www.ct.ingv.it/"
+            href="https://www.usgs.gov/programs/VHP/volcano-activity-notices"
             target="_blank"
             rel="noopener noreferrer"
-            className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-blue-500/40 transition group block"
+            className="text-cyan-300 hover:underline"
           >
-            <div className="flex items-center justify-between text-blue-400 font-semibold mb-1">
-              <span>INGV Osservatorio Etneo</span>
-              <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-            </div>
-            <p className="text-slate-400 text-[11px]">
-              Surveillance bulletins for Etna, Stromboli and Sicilian volcanoes
-            </p>
+            USGS activity notices
           </a>
         </div>
       </section>
