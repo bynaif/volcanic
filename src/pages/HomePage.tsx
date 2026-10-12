@@ -13,6 +13,7 @@ import {
   Waves,
 } from 'lucide-react';
 import { AppRoute } from '../types';
+import { formatDepthKm } from '../utils/units';
 import { TelemetryStatusModal } from '../components/TelemetryStatusModal';
 import {
   useEarthquakeData,
@@ -134,7 +135,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
                       <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-400 mt-0.5">
                         <span className="flex items-center gap-1 text-slate-300">
                           <Waves className="w-3 h-3 text-cyan-400" />
-                          <span>Depth: {depth !== undefined ? `${depth.toFixed(1)} km` : 'N/A'}</span>
+                          <span>Depth: {depth !== undefined ? formatDepthKm(depth) : 'N/A'}</span>
                         </span>
                         <span aria-hidden="true" className="text-slate-600">·</span>
                         <span className="text-slate-400 font-mono">

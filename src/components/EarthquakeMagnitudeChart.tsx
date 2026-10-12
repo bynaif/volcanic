@@ -12,6 +12,7 @@ import {
 } from 'recharts';
 import { BarChart3, TrendingUp, Info } from 'lucide-react';
 import { EarthquakeFeature } from '../types';
+import { formatDepthKm } from '../utils/units';
 
 interface EarthquakeMagnitudeChartProps {
   quakes: EarthquakeFeature[];
@@ -76,7 +77,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
           </div>
           <div>
             <span className="text-slate-500 block text-[10px]">DEPTH</span>
-            <span className="text-slate-300">{data.depth.toFixed(1)} km</span>
+            <span className="text-slate-300">{formatDepthKm(data.depth)}</span>
           </div>
         </div>
       </div>

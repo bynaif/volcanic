@@ -138,7 +138,7 @@ export function getMagnitudeColor(mag: number | null): {
       bg: 'bg-orange-500/15',
       border: 'border-orange-400/30',
       hex: '#f97316',
-      badge: 'Strong Warning',
+      badge: 'Strong · M4.5–5.9',
     };
   }
 
@@ -147,7 +147,7 @@ export function getMagnitudeColor(mag: number | null): {
     bg: 'bg-rose-500/20',
     border: 'border-rose-400/40',
     hex: '#f43f5e',
-    badge: 'Major Disaster',
+    badge: 'Major · M6.0+',
   };
 }
 

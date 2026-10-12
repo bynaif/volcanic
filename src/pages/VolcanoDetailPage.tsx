@@ -26,6 +26,14 @@ import { useVolcanoWeather, getWeatherDescription } from '../hooks/useVolcanoWea
 import { useEarthquakeData, getMagnitudeColor, getRelativeTime } from '../hooks/useEarthquakeData';
 import { DataCardHeader } from '../components/DataCardHeader';
 import { DataErrorState } from '../components/DataErrorState';
+import {
+  formatElevationM,
+  formatTemperatureC,
+  formatWindSpeedKmh,
+  formatPrecipitationMm,
+  formatDistanceKm,
+  formatDepthKm,
+} from '../utils/units';
 
 interface VolcanoDetailPageProps {
   volcanoId: string;
@@ -147,7 +155,7 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
                 </span>
               </span>
               <span className="text-slate-600">·</span>
-              <span>Elevation: {volcano.elevationM.toLocaleString()} m ({volcano.elevationFt.toLocaleString()} ft)</span>
+              <span>Elevation: {formatElevationM(volcano.elevationM)}</span>
             </div>
           </div>
 
@@ -223,10 +231,10 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
                   <Thermometer className="w-4 h-4 text-rose-400" />
                 </div>
                 <div className="text-xl sm:text-2xl font-bold text-white font-mono">
-                  {weather.current.temperature.toFixed(1)}°C
+                  {formatTemperatureC(weather.current.temperature)}
                 </div>
                 <div className="text-[11px] text-slate-400">
-                  Feels like {weather.current.apparentTemperature.toFixed(1)}°C
+                  Feels like {formatTemperatureC(weather.current.apparentTemperature)}
                 </div>
               </div>
 
@@ -251,7 +259,7 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
                   <Wind className="w-4 h-4 text-cyan-400" />
                 </div>
                 <div className="text-xl sm:text-2xl font-bold text-white font-mono">
-                  {weather.current.windSpeed.toFixed(1)} km/h
+                  {formatWindSpeedKmh(weather.current.windSpeed)}
                 </div>
                 <div className="text-[11px] text-slate-400">10m AGL wind vector</div>
               </div>
@@ -266,7 +274,7 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
                   {weather.current.relativeHumidity}%
                 </div>
                 <div className="text-[11px] text-slate-400">
-                  Rain: {weather.current.precipitation} mm
+                  Rain: {formatPrecipitationMm(weather.current.precipitation)}
                 </div>
               </div>
             </div>
@@ -295,13 +303,13 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
                         {desc.label}
                       </span>
                       <div className="text-xs font-mono text-slate-200">
-                        <span className="text-white font-bold">{Math.round(day.tempMax)}°</span>
+                        <span className="text-white font-bold">{formatTemperatureC(day.tempMax)}</span>
                         <span className="text-slate-500 mx-1">/</span>
-                        <span className="text-slate-400">{Math.round(day.tempMin)}°</span>
+                        <span className="text-slate-400">{formatTemperatureC(day.tempMin)}</span>
                       </div>
                       {day.precipitationSum > 0 && (
                         <span className="text-[10px] text-cyan-400 font-mono">
-                          {day.precipitationSum.toFixed(1)} mm
+                          {formatPrecipitationMm(day.precipitationSum)}
                         </span>
                       )}
                     </div>
@@ -372,10 +380,10 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
                       </p>
                       <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-400 mt-0.5">
                         <span className="text-cyan-300 font-semibold font-mono">
-                          {distanceKm.toFixed(1)} km away
+                          {formatDistanceKm(distanceKm)} away
                         </span>
                         <span className="text-slate-600">·</span>
-                        <span>Depth: {depth.toFixed(1)} km</span>
+                        <span>Depth: {formatDepthKm(depth)}</span>
                         <span className="text-slate-600">·</span>
                         <span>{getRelativeTime(feature.properties.time)}</span>
                       </div>

@@ -25,6 +25,8 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { AppRoute, EarthquakeFeature } from '../types';
+import { formatElevationM } from '../utils/units';
+import { formatDepthKm } from '../utils/units';
 import { WELL_KNOWN_VOLCANOES, Volcano } from '../data/volcanoes';
 import {
   useEarthquakeData,
@@ -605,7 +607,7 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
                     <div>
                       <span className="font-semibold">{volcano.name}</span>
                       <span className="text-[11px] text-slate-400 ml-1.5">
-                        {volcano.country} · {volcano.elevationM}m
+                        {volcano.country} · {formatElevationM(volcano.elevationM)}
                       </span>
                     </div>
                   </div>
@@ -853,7 +855,7 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
                     {selectedQuake.properties.place || 'Unknown Location'}
                   </h3>
                   <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5">
-                    <span>Depth: {selectedQuake.geometry.coordinates[2].toFixed(1)} km</span>
+                    <span>Depth: {formatDepthKm(selectedQuake.geometry.coordinates[2])}</span>
                     <span>·</span>
                     <span className="text-cyan-400">
                       {getRelativeTime(selectedQuake.properties.time)}

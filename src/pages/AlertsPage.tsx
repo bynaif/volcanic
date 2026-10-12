@@ -16,6 +16,7 @@ import {
   formatTimeLocal,
   formatTimeUTC,
 } from '../hooks/useEarthquakeData';
+import { formatDepthKm } from '../utils/units';
 import { DataCardHeader } from '../components/DataCardHeader';
 import { DataErrorState } from '../components/DataErrorState';
 import { EarthquakeSkeleton } from '../components/EarthquakeSkeleton';
@@ -248,7 +249,7 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({ onNavigate }) => {
                             <Waves className="h-3.5 w-3.5 text-cyan-400" />
                             Depth:{' '}
                             {Number.isFinite(depth)
-                              ? `${depth.toFixed(1)} km`
+                              ? formatDepthKm(depth)
                               : 'Unavailable'}
                           </span>
                           <span className="flex items-center gap-1.5 text-slate-400">

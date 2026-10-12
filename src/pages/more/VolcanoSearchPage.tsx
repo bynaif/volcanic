@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { AppRoute } from '../../types';
 import { WELL_KNOWN_VOLCANOES, Volcano } from '../../data/volcanoes';
+import { formatElevationM } from '../../utils/units';
 
 interface VolcanoSearchPageProps {
   onNavigate: (route: AppRoute) => void;
@@ -172,8 +173,7 @@ export const VolcanoSearchPage: React.FC<VolcanoSearchPageProps> = ({ onNavigate
                 <div className="mt-3.5 grid grid-cols-2 gap-2 text-xs font-mono text-slate-300">
                   <div className="p-2 rounded-lg bg-slate-950/60 border border-slate-800/60">
                     <span className="text-[10px] text-slate-500 block uppercase">Elevation</span>
-                    <span>{volcano.elevationM.toLocaleString()} m</span>
-                    <span className="text-slate-500 text-[10px] ml-1">({volcano.elevationFt.toLocaleString()} ft)</span>
+                    <span>{formatElevationM(volcano.elevationM)}</span>
                   </div>
 
                   <div className="p-2 rounded-lg bg-slate-950/60 border border-slate-800/60">

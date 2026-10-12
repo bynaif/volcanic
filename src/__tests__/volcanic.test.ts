@@ -73,15 +73,15 @@ describe('USGS Data Parser & Formatting Helpers', () => {
     expect(moderate.hex).toBe('#f59e0b');
     expect(moderate.badge).toBe('Light / Moderate');
 
-    // Strong Warning (4.5 - 5.99)
+    // Strong magnitude (4.5 - 5.99)
     const strong = getMagnitudeColor(5.2);
     expect(strong.hex).toBe('#f97316');
-    expect(strong.badge).toBe('Strong Warning');
+    expect(strong.badge).toBe('Strong · M4.5–5.9');
 
-    // Major Alert (>= 6.0)
+    // Major magnitude (>= 6.0)
     const major = getMagnitudeColor(6.8);
     expect(major.hex).toBe('#f43f5e');
-    expect(major.badge).toBe('Major Disaster');
+    expect(major.badge).toBe('Major · M6.0+');
 
     // Null or invalid magnitude fallback
     const fallback = getMagnitudeColor(null);
