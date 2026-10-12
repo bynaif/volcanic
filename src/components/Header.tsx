@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Activity, Shield, ArrowLeft } from 'lucide-react';
+import { Activity, Shield, ArrowLeft, Radio } from 'lucide-react';
 import { AppRoute } from '../types';
 import { PWAInstallButton } from './PWAInstallButton';
 import { TelemetryStatusModal } from './TelemetryStatusModal';
+import { useEarthquakeData } from '../hooks/useEarthquakeData';
 
 interface HeaderProps {
   currentRoute: AppRoute;
@@ -12,6 +13,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ currentRoute, onNavigate, title }) => {
   const [showModal, setShowModal] = useState(false);
+  const { data, loading, error } = useEarthquakeData();
   const isSubRoute = currentRoute.startsWith('more/');
 
   return (
@@ -49,12 +51,12 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute, onNavigate, title 
                     <span className="text-sm font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-200 to-cyan-400 font-mono">
                       VOLCANIC
                     </span>
-                    <span className="hidden sm:inline text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700/60">
-                      PWA
+                    <span className="hidden sm:inline text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-cyan-950/60 text-cyan-400 border border-cyan-800/60">
+                      Phase 2
                     </span>
                   </div>
                   <p className="text-[10px] text-slate-400 hidden xs:block">
-                    Geological Early Warning Baseline
+                    Real-Time Geological Monitoring
                   </p>
                 </div>
               </div>
@@ -74,14 +76,32 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute, onNavigate, title 
               type="button"
               onClick={() => setShowModal(true)}
               aria-label="View data feed status"
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 ${
+                data
+                  ? 'bg-emerald-500/10 hover:bg-emerald-500/20 border-emerald-500/30 text-emerald-300'
+                  : error
+                  ? 'bg-rose-500/10 hover:bg-rose-500/20 border-rose-500/30 text-rose-300'
+                  : 'bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/30 text-amber-300'
+              }`}
             >
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400"></span>
+                <span
+                  className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                    data ? 'bg-emerald-400' : error ? 'bg-rose-400' : 'bg-amber-400'
+                  }`}
+                ></span>
+                <span
+                  className={`relative inline-flex rounded-full h-2 w-2 ${
+                    data ? 'bg-emerald-400' : error ? 'bg-rose-400' : 'bg-amber-400'
+                  }`}
+                ></span>
               </span>
-              <span className="text-[11px] font-medium hidden sm:inline">Data Offline</span>
-              <span className="text-[11px] font-medium sm:hidden">Offline</span>
+              <span className="text-[11px] font-medium hidden sm:inline">
+                {data ? 'USGS Live' : error ? 'Feed Offline' : 'Syncing...'}
+              </span>
+              <span className="text-[11px] font-medium sm:hidden">
+                {data ? 'Live' : error ? 'Offline' : 'Sync'}
+              </span>
             </button>
 
             {/* Install button */}

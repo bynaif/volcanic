@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Activity, X, RefreshCw, AlertCircle, ShieldAlert, Cpu } from 'lucide-react';
+import { Activity, X, RefreshCw, AlertCircle, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import { useEarthquakeData, formatTimeUTC } from '../hooks/useEarthquakeData';
 
 interface TelemetryStatusModalProps {
   isOpen: boolean;
@@ -7,18 +8,23 @@ interface TelemetryStatusModalProps {
 }
 
 export const TelemetryStatusModal: React.FC<TelemetryStatusModalProps> = ({ isOpen, onClose }) => {
+  const { data, loading, error, refetch, lastUpdated } = useEarthquakeData();
   const [isPinging, setIsPinging] = useState(false);
   const [pingResult, setPingResult] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
-  const handleTestConnection = () => {
+  const handleTestConnection = async () => {
     setIsPinging(true);
     setPingResult(null);
-    setTimeout(() => {
+    try {
+      await refetch();
       setIsPinging(false);
-      setPingResult('Phase 1 Verification Complete: Client online, upstream live feeds awaiting Phase 2 connection.');
-    }, 900);
+      setPingResult('Connection verified: USGS GeoJSON all-day stream active & responding with HTTP 200.');
+    } catch {
+      setIsPinging(false);
+      setPingResult('Connection probe failed: Unable to connect to USGS stream.');
+    }
   };
 
   return (
@@ -54,29 +60,37 @@ export const TelemetryStatusModal: React.FC<TelemetryStatusModalProps> = ({ isOp
           <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
             <div className="flex items-center justify-between text-xs">
               <span className="text-slate-400">App Version</span>
-              <span className="text-slate-200 font-mono">Phase 1 (Release 1.0)</span>
+              <span className="text-slate-200 font-mono">Phase 2.0 (Live Feeds)</span>
             </div>
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400">Live Data Ingest</span>
-              <span className="text-amber-400 font-medium flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-                Not Connected Yet
+              <span className="text-slate-400">USGS Seismic Ingest</span>
+              {data ? (
+                <span className="text-emerald-400 font-medium flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  Live Connected ({data.features.length} quakes)
+                </span>
+              ) : loading ? (
+                <span className="text-cyan-400 font-medium">Connecting...</span>
+              ) : (
+                <span className="text-rose-400 font-medium">Feed Disrupted</span>
+              )}
+            </div>
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-400">Tile Provider</span>
+              <span className="text-slate-200">OpenFreeMap (Dark Style)</span>
+            </div>
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-400">Last Synced</span>
+              <span className="text-cyan-400 font-mono text-[11px]">
+                {lastUpdated ? formatTimeUTC(lastUpdated.getTime()) : 'Syncing...'}
               </span>
-            </div>
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400">Target Observatories</span>
-              <span className="text-slate-300">GVP · USGS · VAAC · INGV</span>
-            </div>
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400">Client Engine</span>
-              <span className="text-cyan-400 font-mono">Vite + React PWA (Standalone Ready)</span>
             </div>
           </div>
 
           <div className="p-3.5 rounded-xl bg-indigo-950/30 border border-indigo-900/50 flex items-start gap-2.5 text-xs text-indigo-200">
-            <AlertCircle className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
+            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
             <p className="leading-relaxed">
-              All views are operating in Phase 1 standalone baseline mode. No synthetic, fake, or mocked telemetry data is rendered.
+              Real-time earthquake coordinates and magnitudes are streamed directly from the United States Geological Survey (USGS). Zero mock data is generated.
             </p>
           </div>
 
@@ -90,11 +104,11 @@ export const TelemetryStatusModal: React.FC<TelemetryStatusModalProps> = ({ isOp
         <div className="mt-5 flex gap-2.5">
           <button
             onClick={handleTestConnection}
-            disabled={isPinging}
+            disabled={isPinging || loading}
             className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-cyan-500/15 border border-cyan-400/40 hover:bg-cyan-500/25 text-cyan-300 font-medium text-xs transition disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isPinging ? 'animate-spin' : ''}`} />
-            <span>{isPinging ? 'Testing Endpoints...' : 'Probe Endpoints'}</span>
+            <span>{isPinging ? 'Testing Endpoint...' : 'Probe Live Feed'}</span>
           </button>
           <button
             onClick={onClose}

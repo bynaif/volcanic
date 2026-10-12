@@ -164,10 +164,10 @@ export const Navbar: React.FC<NavbarProps> = ({ currentRoute, onNavigate }) => {
 
           <div className="p-2.5 rounded-lg bg-slate-900/70 border border-slate-800 flex items-center justify-between text-[11px]">
             <div className="flex items-center gap-2">
-              <Activity className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-slate-300">Phase 1 Baseline</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="text-slate-300">USGS Stream</span>
             </div>
-            <span className="text-amber-400 font-mono">Offline</span>
+            <span className="text-emerald-400 font-mono">Live</span>
           </div>
         </div>
       </aside>

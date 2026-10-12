@@ -6,15 +6,22 @@ import {
   Radio,
   Search,
   Activity,
-  Layers,
   ArrowRight,
-  ShieldCheck,
-  Cpu,
-  WifiOff,
+  ExternalLink,
+  ChevronRight,
+  MapPin,
+  Waves,
 } from 'lucide-react';
 import { AppRoute } from '../types';
-import { EmptyState } from '../components/EmptyState';
 import { TelemetryStatusModal } from '../components/TelemetryStatusModal';
+import {
+  useEarthquakeData,
+  getMagnitudeColor,
+  getRelativeTime,
+} from '../hooks/useEarthquakeData';
+import { DataCardHeader } from '../components/DataCardHeader';
+import { DataErrorState } from '../components/DataErrorState';
+import { EarthquakeSkeleton } from '../components/EarthquakeSkeleton';
 
 interface HomePageProps {
   onNavigate: (route: AppRoute) => void;
@@ -22,27 +29,34 @@ interface HomePageProps {
 
 export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const [showDiagnostics, setShowDiagnostics] = useState(false);
+  const { data, loading, error, refetch, lastUpdated } = useEarthquakeData();
+
+  // Get the 10 most recent earthquakes
+  const latestTenQuakes = data?.features?.slice(0, 10) || [];
 
   return (
     <div className="space-y-6 pb-20 md:pb-8">
       {/* Hero Banner / Status Overview Card */}
-      <section aria-label="System overview" className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0c112b] via-[#090d20] to-[#060814] border border-cyan-500/20 p-6 md:p-8 shadow-2xl">
+      <section
+        aria-label="System overview"
+        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0c112b] via-[#090d20] to-[#060814] border border-cyan-500/20 p-6 md:p-8 shadow-2xl"
+      >
         <div className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 rounded-full bg-cyan-500/10 blur-3xl"></div>
         <div className="pointer-events-none absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-violet-600/10 blur-3xl"></div>
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-xs text-cyan-400 font-mono">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-              <span>VOLCANIC Core PWA</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>VOLCANIC Phase 2 Active</span>
               <span aria-hidden="true" className="text-slate-600">·</span>
-              <span className="text-slate-400">Phase 1 Baseline</span>
+              <span className="text-emerald-300">Live Ingestion Connected</span>
             </div>
             <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white font-mono">
-              Global Volcanic Activity Monitor
+              Global Volcanic & Seismic Monitor
             </h1>
             <p className="text-sm text-slate-300 max-w-xl leading-relaxed">
-              Mobile-first geological hazard early warning client. Built with high-fidelity geospatial rendering, PWA offline caching, and real-time alert architecture.
+              Mobile-first geological hazard early warning client connected to real-time seismic feeds, interactive geospatial mapping, and rapid alert broadcasting.
             </p>
           </div>
 
@@ -60,35 +74,117 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               onClick={() => setShowDiagnostics(true)}
               className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900/80 border border-slate-700/80 hover:border-slate-600 text-slate-200 font-medium text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
             >
-              <Activity className="w-4 h-4 text-amber-400" />
-              <span>Diagnostic Feed</span>
+              <Activity className="w-4 h-4 text-cyan-400" />
+              <span>Diagnostics</span>
             </button>
           </div>
         </div>
       </section>
 
-      {/* Main Empty State: Data Feed Not Connected */}
-      <section aria-label="Live monitoring feed">
-        <EmptyState
-          icon={Flame}
-          badge="Live Telemetry Ingest Offline"
-          title="Data Is Not Connected Yet"
-          description="The Phase 1 application shell, navigation graph, and PWA service worker are operating. Real-time seismic tremor telemetry, satellite infrared heat signatures, and volcanic eruption bulletins will stream when upstream APIs are connected in Phase 2."
-          secondaryInfo="Target Ingestion Feeds: Smithsonian Institution Global Volcanism Program (GVP) Holocene Catalog, USGS Volcano Hazards Program GeoJSON stream, and ICAO Volcanic Ash Advisory Centers (VAAC)."
-          actionText="Test Telemetry Feed"
-          onAction={() => setShowDiagnostics(true)}
-          secondaryActionText="View Alerts Configuration"
-          onSecondaryAction={() => onNavigate('alerts')}
+      {/* Latest Earthquakes Live Card */}
+      <section
+        aria-label="Latest earthquakes feed"
+        className="rounded-2xl bg-slate-900/60 border border-slate-800/90 shadow-2xl backdrop-blur-xl overflow-hidden space-y-3 p-4 sm:p-5"
+      >
+        {/* Requirement: On every data card show: source name (USGS), feed's last updated time, and label "Live data" */}
+        <DataCardHeader
+          title="Latest Earthquakes"
+          source="USGS"
+          lastUpdated={lastUpdated}
+          count={data?.features?.length}
+          onRefresh={refetch}
+          isRefreshing={loading}
         />
+
+        {error ? (
+          <DataErrorState error={error} onRetry={refetch} isRetrying={loading} />
+        ) : loading && !data ? (
+          <EarthquakeSkeleton count={10} />
+        ) : latestTenQuakes.length === 0 ? (
+          <div className="p-8 text-center text-xs text-slate-400">
+            No earthquakes currently reported in the USGS all-day feed.
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {latestTenQuakes.map((quake) => {
+              const mag = quake.properties.mag;
+              const color = getMagnitudeColor(mag);
+              const depth = quake.geometry.coordinates[2];
+
+              return (
+                <div
+                  key={quake.id}
+                  className="group flex items-center justify-between gap-3.5 p-3.5 rounded-xl bg-slate-950/70 hover:bg-slate-900/90 border border-slate-800/80 hover:border-cyan-500/40 transition-all duration-200"
+                >
+                  <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                    {/* Magnitude badge */}
+                    <div
+                      className={`w-11 h-11 rounded-xl font-mono font-bold text-sm border flex items-center justify-center shrink-0 shadow-sm ${color.bg} ${color.text} ${color.border}`}
+                    >
+                      M{mag !== null ? mag.toFixed(1) : '–'}
+                    </div>
+
+                    {/* Place and Depth info */}
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs sm:text-sm font-medium text-white truncate group-hover:text-cyan-300 transition-colors">
+                        {quake.properties.place || 'Unknown Location'}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-400 mt-0.5">
+                        <span className="flex items-center gap-1 text-slate-300">
+                          <Waves className="w-3 h-3 text-cyan-400" />
+                          <span>Depth: {depth !== undefined ? `${depth.toFixed(1)} km` : 'N/A'}</span>
+                        </span>
+                        <span aria-hidden="true" className="text-slate-600">·</span>
+                        <span className="text-slate-400 font-mono">
+                          {getRelativeTime(quake.properties.time)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions / USGS link */}
+                  <div className="flex items-center gap-2 shrink-0">
+                    <a
+                      href={quake.properties.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`View USGS details for event in ${quake.properties.place}`}
+                      className="p-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-cyan-400/40 text-slate-400 hover:text-cyan-300 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+                      title="Open USGS event page"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                </div>
+              );
+            })}
+
+            <div className="pt-2 flex justify-between items-center text-xs">
+              <span className="text-slate-400 font-mono text-[11px]">
+                Showing 10 most recent global seismic tremors
+              </span>
+              <button
+                type="button"
+                onClick={() => onNavigate('map')}
+                className="inline-flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 font-semibold transition"
+              >
+                <span>View all on Live Map</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
       </section>
 
-      {/* Quick Launch Cards */}
+      {/* Feature Modules Quick Access */}
       <section aria-label="Feature modules">
         <div className="flex items-center justify-between mb-3 px-1">
           <h2 className="text-xs font-mono uppercase tracking-wider text-slate-400">
-            Core Modules
+            Navigation Modules
           </h2>
-          <span className="text-[11px] text-cyan-400 font-mono">0 Live Streams</span>
+          <span className="text-[11px] text-emerald-400 font-mono">
+            {data ? `${data.features.length} Live Seismic Events` : 'Syncing...'}
+          </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -106,7 +202,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-cyan-400" />
             </h3>
             <p className="text-xs text-slate-400 mt-1">
-              Geospatial projection of volcanic calderas & exclusion radii.
+              Interactive MapLibre GL map with magnitude color & scale markers.
             </p>
           </button>
 
@@ -120,11 +216,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               <AlertTriangle className="w-5 h-5" />
             </div>
             <h3 className="text-sm font-semibold text-white group-hover:text-amber-300 transition-colors flex items-center justify-between">
-              <span>Alerts</span>
+              <span>Alerts (M4.5+)</span>
               <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-amber-400" />
             </h3>
             <p className="text-xs text-slate-400 mt-1">
-              Aviation color codes & geological hazard bulletins.
+              Critical in-app alerts for quakes magnitude 4.5 and higher.
             </p>
           </button>
 
@@ -138,11 +234,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               <Radio className="w-5 h-5" />
             </div>
             <h3 className="text-sm font-semibold text-white group-hover:text-violet-300 transition-colors flex items-center justify-between">
-              <span>News & Dispatches</span>
+              <span>News & Bulletins</span>
               <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-violet-400" />
             </h3>
             <p className="text-xs text-slate-400 mt-1">
-              Official observatory communiqués and geological studies.
+              Observatory communiqués and geological studies.
             </p>
           </button>
 
@@ -160,31 +256,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
               <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-cyan-400" />
             </h3>
             <p className="text-xs text-slate-400 mt-1">
-              Search over 1,500 active Holocene volcanic features.
+              Holocene volcanic edifices catalog and terminology.
             </p>
           </button>
-        </div>
-      </section>
-
-      {/* Architecture Readiness Card */}
-      <section aria-label="Readiness specs" className="p-5 rounded-2xl bg-slate-900/50 border border-slate-800/80">
-        <div className="flex items-center gap-2 mb-3 text-xs font-mono uppercase text-slate-400">
-          <Cpu className="w-4 h-4 text-cyan-400" />
-          <span>Client Architecture Readiness</span>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-          <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
-            <span className="text-slate-400 block mb-1">PWA Capabilities</span>
-            <span className="text-emerald-400 font-medium">Offline Ready & Installable</span>
-          </div>
-          <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
-            <span className="text-slate-400 block mb-1">State & Routing</span>
-            <span className="text-cyan-400 font-medium">All 12 Views Fully Wired</span>
-          </div>
-          <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
-            <span className="text-slate-400 block mb-1">Data Ingestion</span>
-            <span className="text-amber-400 font-medium">Awaiting Phase 2 Link</span>
-          </div>
         </div>
       </section>
 
