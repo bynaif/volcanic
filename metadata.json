@@ -1,0 +1,6 @@
+{
+  "name": "VOLCANIC",
+  "description": "Mobile-first volcano monitoring, early warning alerts, and geological hazard tracking PWA.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
