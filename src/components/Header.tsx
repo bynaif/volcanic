@@ -18,7 +18,7 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute, onNavigate, title 
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full bg-[#070914]/90 backdrop-blur-xl border-b border-slate-800/80 px-4 md:px-6 py-3 transition-colors">
+      <header className="sticky top-0 z-40 w-full theme-header backdrop-blur-xl border-b theme-border px-4 md:px-6 py-3 transition-colors">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           {/* Left: Brand or Back Button */}
           <div className="flex items-center gap-3">
@@ -27,14 +27,14 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute, onNavigate, title 
                 type="button"
                 onClick={() => onNavigate('more')}
                 aria-label="Back to More menu"
-                className="group flex items-center gap-1.5 px-2.5 py-1.5 -ml-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 transition"
+                className="group flex items-center gap-1.5 px-2.5 py-1.5 -ml-2 rounded-lg theme-text-muted hover:theme-text hover:theme-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 transition"
               >
-                <ArrowLeft className="w-4 h-4 text-cyan-400 group-hover:-translate-x-0.5 transition-transform" />
+                <ArrowLeft className="w-4 h-4 theme-accent group-hover:-translate-x-0.5 transition-transform" />
                 <span className="text-xs font-medium">More</span>
               </button>
             ) : (
               <div className="flex items-center gap-2.5">
-                <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500/20 to-violet-600/30 border border-cyan-400/30 text-cyan-400 shadow-md shadow-cyan-950/40">
+                <div className="relative flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--accent-soft)] border border-cyan-400/30 theme-accent shadow-md shadow-cyan-950/40">
                   {/* Glowing volcanic icon */}
                   <svg className="w-5 h-5 fill-none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 2L15 8L19 12L21 21H3L5 12L9 8L12 2Z" />
@@ -48,14 +48,14 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute, onNavigate, title 
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-200 to-cyan-400 font-mono">
+                    <span className="text-sm font-black tracking-wider text-[var(--text)] font-mono">
                       VOLCANIC
                     </span>
-                    <span className="hidden sm:inline text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-cyan-950/60 text-cyan-400 border border-cyan-800/60">
+                    <span className="hidden sm:inline text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-cyan-950/60 theme-accent border border-cyan-800/60">
                       Phase 2
                     </span>
                   </div>
-                  <p className="text-[10px] text-slate-400 hidden xs:block">
+                  <p className="text-[10px] theme-text-muted hidden xs:block">
                     Real-Time Geological Monitoring
                   </p>
                 </div>
@@ -63,7 +63,7 @@ export const Header: React.FC<HeaderProps> = ({ currentRoute, onNavigate, title 
             )}
 
             {title && isSubRoute && (
-              <span className="text-sm font-semibold text-white truncate max-w-[180px] xs:max-w-none">
+              <span className="text-sm font-semibold theme-text truncate max-w-[180px] xs:max-w-none">
                 {title}
               </span>
             )}

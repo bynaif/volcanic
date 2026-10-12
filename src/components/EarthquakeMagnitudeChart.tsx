@@ -70,13 +70,13 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
         <p className="text-white font-medium mb-1 line-clamp-2">
           {data.fullPlace}
         </p>
-        <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-400 mt-2 font-mono">
+        <div className="grid grid-cols-2 gap-2 text-[11px] leading-relaxed text-stone-600 mt-2 font-mono">
           <div>
-            <span className="text-slate-500 block text-[10px]">TIME</span>
+            <span className="text-stone-600 block text-[10px]">TIME</span>
             <span className="text-slate-300">{data.timeFormatted}</span>
           </div>
           <div>
-            <span className="text-slate-500 block text-[10px]">DEPTH</span>
+            <span className="text-stone-600 block text-[10px]">DEPTH</span>
             <span className="text-slate-300">{formatDepthKm(data.depth)}</span>
           </div>
         </div>
@@ -125,22 +125,22 @@ export const EarthquakeMagnitudeChart: React.FC<EarthquakeMagnitudeChartProps> =
   return (
     <div
       aria-label="Earthquake magnitude distribution chart"
-      className="rounded-2xl bg-slate-900/60 border border-slate-800/90 shadow-2xl backdrop-blur-xl p-4 sm:p-5 space-y-4"
+      className="rounded-2xl bg-white border border-stone-200 shadow-sm p-4 sm:p-6 space-y-4"
     >
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-800/80">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-stone-200">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+          <div className="w-8 h-8 rounded-lg bg-orange-50 border border-orange-200 flex items-center justify-center text-orange-700">
             <BarChart3 className="w-4 h-4" />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-white tracking-wide flex items-center gap-2">
+            <h2 className="text-sm font-bold text-stone-900 tracking-wide flex items-center gap-2">
               <span>Recent Activity Trend</span>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 font-medium">
+              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-orange-50 text-orange-800 border border-orange-200 font-medium">
                 10 Most Recent
               </span>
             </h2>
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] leading-relaxed text-stone-600">
               Distribution of tremor intensities from newest (left) to 10th newest (right)
             </p>
           </div>
@@ -148,17 +148,17 @@ export const EarthquakeMagnitudeChart: React.FC<EarthquakeMagnitudeChartProps> =
 
         {/* Quick summary badges */}
         <div className="flex items-center gap-2 font-mono text-[11px]">
-          <div className="px-2 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300 flex items-center gap-1.5">
-            <span className="text-slate-500">MAX:</span>
-            <span className="font-bold text-amber-400">M{maxMag.toFixed(1)}</span>
+          <div className="px-2 py-1.5 rounded-lg bg-stone-50 border border-stone-200 text-stone-700 flex items-center gap-1.5">
+            <span className="text-stone-600">MAX:</span>
+            <span className="font-bold text-amber-700">M{maxMag.toFixed(1)}</span>
           </div>
-          <div className="px-2 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300 flex items-center gap-1.5">
-            <span className="text-slate-500">AVG:</span>
-            <span className="font-bold text-cyan-300">M{avgMag.toFixed(1)}</span>
+          <div className="px-2 py-1.5 rounded-lg bg-stone-50 border border-stone-200 text-stone-700 flex items-center gap-1.5">
+            <span className="text-stone-600">AVG:</span>
+            <span className="font-bold text-sky-800">M{avgMag.toFixed(1)}</span>
           </div>
-          <div className="px-2 py-1 rounded-lg bg-slate-950/80 border border-slate-800 text-slate-300 flex items-center gap-1.5">
-            <span className="text-slate-500">MIN:</span>
-            <span className="font-bold text-emerald-400">M{minMag.toFixed(1)}</span>
+          <div className="px-2 py-1.5 rounded-lg bg-stone-50 border border-stone-200 text-stone-700 flex items-center gap-1.5">
+            <span className="text-stone-600">MIN:</span>
+            <span className="font-bold text-emerald-700">M{minMag.toFixed(1)}</span>
           </div>
         </div>
       </div>
@@ -172,20 +172,20 @@ export const EarthquakeMagnitudeChart: React.FC<EarthquakeMagnitudeChartProps> =
           >
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="#1e293b"
+              stroke="#e7e5e4"
               vertical={false}
             />
             <XAxis
               dataKey="index"
               tickLine={false}
-              axisLine={{ stroke: '#334155' }}
-              tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'monospace' }}
+              axisLine={{ stroke: '#a8a29e' }}
+              tick={{ fill: '#57534e', fontSize: 12, fontFamily: 'sans-serif' }}
               tickFormatter={(value) => `#${value}`}
             />
             <YAxis
               tickLine={false}
-              axisLine={{ stroke: '#334155' }}
-              tick={{ fill: '#94a3b8', fontSize: 11, fontFamily: 'monospace' }}
+              axisLine={{ stroke: '#a8a29e' }}
+              tick={{ fill: '#57534e', fontSize: 12, fontFamily: 'sans-serif' }}
               domain={[0, 'auto']}
               unit="M"
               tickCount={5}
@@ -196,13 +196,13 @@ export const EarthquakeMagnitudeChart: React.FC<EarthquakeMagnitudeChartProps> =
             />
             <ReferenceLine
               y={avgMag}
-              stroke="#06b6d4"
+              stroke="#d95735"
               strokeDasharray="4 4"
               strokeWidth={1.5}
               label={{
                 value: `Avg M${avgMag.toFixed(1)}`,
                 position: 'insideTopRight',
-                fill: '#22d3ee',
+                fill: '#9a3412',
                 fontSize: 10,
                 fontFamily: 'monospace',
               }}
@@ -226,9 +226,9 @@ export const EarthquakeMagnitudeChart: React.FC<EarthquakeMagnitudeChartProps> =
       </div>
 
       {/* Footer Legend & Info */}
-      <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800/60 text-[11px] text-slate-400">
+      <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800/60 text-[11px] leading-relaxed text-stone-600">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-slate-500 font-mono text-[10px]">SEVERITY:</span>
+          <span className="text-stone-600 font-mono text-[10px]">SEVERITY:</span>
           <span className="inline-flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-sm bg-red-500"></span>
             <span>M7+ Major</span>
@@ -250,8 +250,8 @@ export const EarthquakeMagnitudeChart: React.FC<EarthquakeMagnitudeChartProps> =
             <span>&lt;2.5 Minor</span>
           </span>
         </div>
-        <div className="flex items-center gap-1 text-slate-500 font-mono text-[10px]">
-          <TrendingUp className="w-3 h-3 text-cyan-400" />
+        <div className="flex items-center gap-1 text-stone-600 font-mono text-[10px]">
+          <TrendingUp className="w-3 h-3 text-orange-700" />
           <span>Real-time USGS Feed</span>
         </div>
       </div>

@@ -39,42 +39,42 @@ export const TelemetryStatusModal: React.FC<TelemetryStatusModalProps> = ({ isOp
       aria-labelledby="telemetry-modal-title"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md p-4 animate-in fade-in duration-200"
     >
-      <div className="w-full max-w-md rounded-2xl bg-[#0c1022] border border-slate-700/80 p-6 shadow-2xl text-slate-100 relative">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+      <div className="w-full max-w-md rounded-2xl bg-[var(--surface)] border border-[var(--border)] p-6 shadow-2xl text-[var(--text)] relative">
+        <div className="flex items-center justify-between pb-3 border-b border-[var(--border)]">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+            <div className="w-8 h-8 rounded-lg bg-[var(--accent-soft)] border border-[var(--border)] flex items-center justify-center text-[var(--accent)]">
               <Activity className="w-4 h-4" />
             </div>
             <div>
-              <h3 id="telemetry-modal-title" className="text-sm font-semibold text-white">
+              <h3 id="telemetry-modal-title" className="text-sm font-semibold text-[var(--text)]">
                 Data Feed Status Diagnostics
               </h3>
-              <p className="text-[11px] text-slate-400">VOLCANIC Core Telemetry Hub</p>
+              <p className="text-[11px] text-[var(--text-muted)]">VOLCANIC Core Telemetry Hub</p>
             </div>
           </div>
           <button
             onClick={onClose}
             aria-label="Close diagnostics"
-            className="text-slate-400 hover:text-white p-1 rounded-lg focus-visible:ring-2 focus-visible:ring-cyan-400"
+            className="text-[var(--text-muted)] hover:text-[var(--text)] p-1 rounded-lg focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         <div className="mt-4 space-y-3">
-          <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+          <div className="p-3.5 rounded-xl bg-[var(--surface-muted)] border border-[var(--border)] space-y-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400">App Version</span>
-              <span className="text-slate-200 font-mono">Phase 2.0 (Live Feeds)</span>
+              <span className="text-[var(--text-muted)]">App Version</span>
+              <span className="text-[var(--text)] font-mono">Phase 2.0 (Live Feeds)</span>
             </div>
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400">USGS Seismic Ingest</span>
+              <span className="text-[var(--text-muted)]">USGS Seismic Ingest</span>
               {error ? (
                 <span className="text-amber-300 font-medium">
                   {data ? 'Refresh Failed · Cached Data Available' : 'Feed Unavailable'}
                 </span>
               ) : loading ? (
-                <span className="text-cyan-400 font-medium">Connecting...</span>
+                <span className="text-[var(--accent)] font-medium">Connecting...</span>
               ) : data ? (
                 <span className="text-emerald-400 font-medium flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
@@ -85,18 +85,18 @@ export const TelemetryStatusModal: React.FC<TelemetryStatusModalProps> = ({ isOp
               )}
             </div>
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400">Tile Provider</span>
-              <span className="text-slate-200">OpenFreeMap (Dark Style)</span>
+              <span className="text-[var(--text-muted)]">Tile Provider</span>
+              <span className="text-[var(--text)]">OpenFreeMap (Dark Style)</span>
             </div>
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400">Feed Timestamp</span>
+              <span className="text-[var(--text-muted)]">Feed Timestamp</span>
               <span className="text-violet-300 font-mono text-[11px]">
                 {feedGenerated ? formatTimeUTC(feedGenerated.getTime()) : 'Syncing...'}
               </span>
             </div>
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400">Client Fetched</span>
-              <span className="text-cyan-300 font-mono text-[11px]">
+              <span className="text-[var(--text-muted)]">Client Fetched</span>
+              <span className="text-[var(--accent)] font-mono text-[11px]">
                 {fetchTime ? formatTimeUTC(fetchTime.getTime()) : 'Syncing...'}
               </span>
             </div>
@@ -120,14 +120,14 @@ export const TelemetryStatusModal: React.FC<TelemetryStatusModalProps> = ({ isOp
           <button
             onClick={handleTestConnection}
             disabled={isPinging || loading}
-            className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-cyan-500/15 border border-cyan-400/40 hover:bg-cyan-500/25 text-cyan-300 font-medium text-xs transition disabled:opacity-50"
+            className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-cyan-500/15 border border-cyan-400/40 hover:bg-cyan-500/25 text-[var(--accent)] font-medium text-xs transition disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isPinging ? 'animate-spin' : ''}`} />
             <span>{isPinging ? 'Testing Endpoint...' : 'Probe Live Feed'}</span>
           </button>
           <button
             onClick={onClose}
-            className="py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium text-xs transition"
+            className="py-2.5 px-4 rounded-xl bg-[var(--surface-muted)] hover:bg-slate-700 text-[var(--text)] font-medium text-xs transition"
           >
             Dismiss
           </button>

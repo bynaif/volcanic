@@ -54,7 +54,7 @@ export const SheltersPage: React.FC<SheltersPageProps> = ({
       <div className="flex items-center justify-between gap-3">
         <button
           onClick={() => onNavigate('more')}
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-cyan-400 transition hover:text-cyan-300"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-cyan-400 transition hover:text-[var(--accent)]"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           Back to More
@@ -65,7 +65,7 @@ export const SheltersPage: React.FC<SheltersPageProps> = ({
       </div>
 
       <header>
-        <h1 className="font-mono text-xl font-bold tracking-tight text-white md:text-2xl">
+        <h1 className="font-mono text-xl font-bold tracking-tight text-[var(--text)] md:text-2xl">
           Emergency Shelters & Relief Hubs
         </h1>
         <p className="mt-2 text-sm leading-6 text-slate-400">
@@ -98,8 +98,8 @@ export const SheltersPage: React.FC<SheltersPageProps> = ({
 
       <section className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 md:p-5">
         <div className="flex items-center gap-2">
-          <ClipboardCheck className="h-4 w-4 text-cyan-300" />
-          <h2 className="text-sm font-semibold text-white">
+          <ClipboardCheck className="h-4 w-4 text-[var(--accent)]" />
+          <h2 className="text-sm font-semibold text-[var(--text)]">
             Before relying on a shelter listing
           </h2>
         </div>
@@ -118,8 +118,8 @@ export const SheltersPage: React.FC<SheltersPageProps> = ({
 
       <section className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 md:p-5">
         <div className="flex items-center gap-2">
-          <Phone className="h-4 w-4 text-cyan-300" />
-          <h2 className="text-sm font-semibold text-white">
+          <Phone className="h-4 w-4 text-[var(--accent)]" />
+          <h2 className="text-sm font-semibold text-[var(--text)]">
             Need emergency assistance?
           </h2>
         </div>
@@ -133,7 +133,7 @@ export const SheltersPage: React.FC<SheltersPageProps> = ({
 
       <section className="space-y-3">
         <div>
-          <h2 className="text-sm font-semibold text-white">
+          <h2 className="text-sm font-semibold text-[var(--text)]">
             Shelter and relief information sources
           </h2>
           <p className="mt-1 text-xs leading-5 text-slate-400">
@@ -152,10 +152,10 @@ export const SheltersPage: React.FC<SheltersPageProps> = ({
               className="group block rounded-xl border border-slate-800 bg-slate-950/60 p-4 transition hover:border-cyan-700/70"
             >
               <div className="flex items-start justify-between gap-3">
-                <h3 className="text-xs font-semibold leading-5 text-cyan-200">
+                <h3 className="text-xs font-semibold leading-5 text-[var(--accent-hover)]">
                   {resource.title}
                 </h3>
-                <ExternalLink className="h-3.5 w-3.5 shrink-0 text-slate-500 transition group-hover:text-cyan-300" />
+                <ExternalLink className="h-3.5 w-3.5 shrink-0 text-slate-500 transition group-hover:text-[var(--accent)]" />
               </div>
               <p className="mt-2 text-xs leading-5 text-slate-400">
                 {resource.description}
@@ -170,7 +170,7 @@ export const SheltersPage: React.FC<SheltersPageProps> = ({
 
       <section className="rounded-xl border border-slate-800 bg-slate-900/40 p-4">
         <div className="flex items-start gap-2">
-          <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-cyan-300" />
+          <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[var(--accent)]" />
           <div>
             <h2 className="text-xs font-semibold text-slate-200">
               About nearby shelter searches

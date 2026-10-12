@@ -1,24 +1,13 @@
 import React, { useState } from 'react';
 import {
-  Flame,
-  Globe2,
-  AlertTriangle,
-  Radio,
-  Search,
-  Activity,
-  ArrowRight,
-  ExternalLink,
-  ChevronRight,
-  MapPin,
-  Waves,
+  Activity, AlertTriangle, ArrowRight, ExternalLink,
+  Globe2, Radio, Search, Waves,
 } from 'lucide-react';
 import { AppRoute } from '../types';
 import { formatDepthKm } from '../utils/units';
 import { TelemetryStatusModal } from '../components/TelemetryStatusModal';
 import {
-  useEarthquakeData,
-  getMagnitudeColor,
-  getRelativeTime,
+  useEarthquakeData, getMagnitudeColor, getRelativeTime,
 } from '../hooks/useEarthquakeData';
 import { DataCardHeader } from '../components/DataCardHeader';
 import { DataErrorState } from '../components/DataErrorState';
@@ -32,248 +21,185 @@ interface HomePageProps {
 export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const [showDiagnostics, setShowDiagnostics] = useState(false);
   const { data, loading, error, refetch, feedGenerated, fetchTime } = useEarthquakeData();
+  const quakes = data?.features?.slice(0, 10) || [];
 
-  // Get the 10 most recent earthquakes
-  const latestTenQuakes = data?.features?.slice(0, 10) || [];
+  const linkClass = 'group flex items-center justify-between gap-3 border-b border-[var(--border)] py-5 text-left transition hover:bg-[var(--surface-muted)]';
+  const labelClass = 'text-[10px] font-bold uppercase tracking-[.2em] text-[#bc4a2b]';
 
   return (
-    <div className="space-y-6 pb-20 md:pb-8">
-      {/* Hero Banner / Status Overview Card */}
-      <section
-        aria-label="System overview"
-        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0c112b] via-[#090d20] to-[#060814] border border-cyan-500/20 p-6 md:p-8 shadow-2xl"
-      >
-        <div className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 rounded-full bg-cyan-500/10 blur-3xl"></div>
-        <div className="pointer-events-none absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-violet-600/10 blur-3xl"></div>
+    <main className="min-h-screen bg-[var(--page)] pb-24 text-[var(--text)] md:pb-12">
+      <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-xs text-cyan-400 font-mono">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span>VOLCANIC Phase 2 Active</span>
-              <span aria-hidden="true" className="text-slate-600">·</span>
-              <span className="text-emerald-300">Live Ingestion Connected</span>
-            </div>
-            <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white font-mono">
-              Global Volcanic & Seismic Monitor
+        <header className="flex items-center justify-between border-b border-[var(--border)] py-5">
+          <button onClick={() => onNavigate('home')} className="flex items-center gap-3" aria-label="VOLCANIC home">
+            <span className="grid h-9 w-9 place-items-center bg-[#d95735] text-white">
+              <Activity size={20} />
+            </span>
+            <span className="text-xl font-black tracking-[-.07em]">VOLCANIC<span className="text-[#d95735]">.</span></span>
+          </button>
+          <div className="hidden text-right sm:block">
+            <p className={labelClass}>Earth, in motion</p>
+            <p className="mt-1 text-xs text-[var(--text-muted)]">Understand our restless planet</p>
+          </div>
+          <button onClick={() => setShowDiagnostics(true)} className="border border-[var(--border)] px-3 py-2 text-xs font-semibold hover:border-[#d95735]">
+            Data status
+          </button>
+        </header>
+
+        <section className="grid gap-8 border-b border-[var(--border)] py-10 md:grid-cols-[1.1fr_.9fr] md:items-center md:py-16">
+          <div>
+            <p className={labelClass}>A field guide to our planet</p>
+            <h1 className="mt-5 text-6xl font-black leading-[.9] tracking-[-.085em] sm:text-8xl lg:text-[100px]">
+              The Earth<br />is <span className="font-serif font-normal italic text-[#d95735]">alive.</span>
             </h1>
-            <p className="text-sm text-slate-300 max-w-xl leading-relaxed">
-              Mobile-first geological hazard early warning client connected to real-time seismic feeds, interactive geospatial mapping, and rapid alert broadcasting.
+            <p className="mt-6 max-w-lg text-base leading-7 text-[var(--text-muted)] sm:text-lg">
+              Discover the forces shaping our world. Explore earthquakes,
+              learn about volcanoes, and understand what scientists are observing —
+              no science degree required.
             </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 shrink-0">
-            <button
-              type="button"
-              onClick={() => onNavigate('map')}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-xs tracking-wide shadow-lg shadow-cyan-950/40 transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
-            >
-              <Globe2 className="w-4 h-4" />
-              <span>Launch Live Map</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowDiagnostics(true)}
-              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900/80 border border-slate-700/80 hover:border-slate-600 text-slate-200 font-medium text-xs transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
-            >
-              <Activity className="w-4 h-4 text-cyan-400" />
-              <span>Diagnostics</span>
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Latest Earthquakes Live Card */}
-      <section
-        aria-label="Latest earthquakes feed"
-        className="rounded-2xl bg-slate-900/60 border border-slate-800/90 shadow-2xl backdrop-blur-xl overflow-hidden space-y-3 p-4 sm:p-5"
-      >
-        {/* Requirement: On every data card show: source name (USGS), feed's last updated time, and label "Live data" */}
-        <DataCardHeader
-          title="Latest Earthquakes"
-          source="USGS"
-          feedTime={feedGenerated}
-          fetchTime={fetchTime}
-          count={data?.features?.length}
-          onRefresh={refetch}
-          isRefreshing={loading}
-          error={error}
-        />
-
-        {error ? (
-          <DataErrorState error={error} onRetry={refetch} isRetrying={loading} />
-        ) : loading && !data ? (
-          <EarthquakeSkeleton count={10} />
-        ) : latestTenQuakes.length === 0 ? (
-          <div className="p-8 text-center text-xs text-slate-400">
-            No earthquakes currently reported in the USGS all-day feed.
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {latestTenQuakes.map((quake) => {
-              const mag = quake.properties.mag;
-              const color = getMagnitudeColor(mag);
-              const depth = quake.geometry.coordinates[2];
-
-              return (
-                <div
-                  key={quake.id}
-                  className="group flex items-center justify-between gap-3.5 p-3.5 rounded-xl bg-slate-950/70 hover:bg-slate-900/90 border border-slate-800/80 hover:border-cyan-500/40 transition-all duration-200"
-                >
-                  <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                    {/* Magnitude badge */}
-                    <div
-                      className={`w-11 h-11 rounded-xl font-mono font-bold text-sm border flex items-center justify-center shrink-0 shadow-sm ${color.bg} ${color.text} ${color.border}`}
-                    >
-                      M{mag !== null ? mag.toFixed(1) : '–'}
-                    </div>
-
-                    {/* Place and Depth info */}
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs sm:text-sm font-medium text-white truncate group-hover:text-cyan-300 transition-colors">
-                        {quake.properties.place || 'Unknown Location'}
-                      </p>
-                      <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-400 mt-0.5">
-                        <span className="flex items-center gap-1 text-slate-300">
-                          <Waves className="w-3 h-3 text-cyan-400" />
-                          <span>Depth: {depth !== undefined ? formatDepthKm(depth) : 'N/A'}</span>
-                        </span>
-                        <span aria-hidden="true" className="text-slate-600">·</span>
-                        <span className="text-slate-400 font-mono">
-                          {getRelativeTime(quake.properties.time)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Actions / USGS link */}
-                  <div className="flex items-center gap-2 shrink-0">
-                    <a
-                      href={quake.properties.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={`View USGS details for event in ${quake.properties.place}`}
-                      className="p-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-cyan-400/40 text-slate-400 hover:text-cyan-300 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
-                      title="Open USGS event page"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-                  </div>
-                </div>
-              );
-            })}
-
-            <div className="pt-2 flex justify-between items-center text-xs">
-              <span className="text-slate-400 font-mono text-[11px]">
-                Showing 10 most recent global seismic tremors
-              </span>
-              <button
-                type="button"
-                onClick={() => onNavigate('map')}
-                className="inline-flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 font-semibold transition"
-              >
-                <span>View all on Live Map</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+            <div className="mt-7 flex flex-wrap gap-3">
+              <button onClick={() => onNavigate('map')} className="flex items-center gap-3 bg-[var(--text)] px-5 py-3.5 text-sm font-bold text-white transition hover:bg-[#d95735]">
+                Explore the live map <ArrowRight size={16} />
               </button>
+              <a href="#earthquakes" className="border border-[var(--border)] px-5 py-3.5 text-sm font-semibold hover:border-[var(--accent)]">
+                Latest earthquakes ↓
+              </a>
             </div>
           </div>
-        )}
-      </section>
 
-      {/* Magnitude Distribution Trend Chart (10 most recent earthquakes) */}
-      {!error && latestTenQuakes.length > 0 && (
-        <section aria-label="Magnitude trend visualization">
-          <EarthquakeMagnitudeChart quakes={latestTenQuakes} />
+          <div className="relative flex min-h-[310px] items-end overflow-hidden bg-[#282e28] p-7 sm:min-h-[390px] sm:p-9">
+            <div className="absolute inset-0 opacity-30" style={{ backgroundImage: 'repeating-radial-gradient(ellipse at 55% 45%, transparent 0 15px, #c9c6ad 16px, transparent 17px 29px)' }} />
+            <div className="absolute inset-x-0 bottom-0 h-[35%] bg-[#3b4438]" />
+            <svg className="absolute inset-0 h-full w-full" viewBox="0 0 500 400" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+              <path d="M30 300 L190 95 L245 168 L285 125 L470 300 Z" fill="#d95735" />
+              <path d="M190 95 L245 168 L216 155 Z" fill="#f0a078" />
+              <path d="M0 325 Q130 280 250 328 T500 320" fill="none" stroke="#d0cfba" strokeOpacity=".45" />
+              <path d="M0 350 Q130 305 250 353 T500 345" fill="none" stroke="#d0cfba" strokeOpacity=".35" />
+              <path d="M0 375 Q130 330 250 378 T500 370" fill="none" stroke="#d0cfba" strokeOpacity=".25" />
+            </svg>
+            <div className="relative z-10 text-[#f7f5ef]">
+              <p className="text-[10px] font-bold uppercase tracking-[.22em] text-[#d8d7c8]">Earth science / 001</p>
+              <h2 className="mt-2 text-3xl font-bold tracking-tight">A living planet.</h2>
+              <p className="mt-2 max-w-xs text-sm leading-6 text-[#d0d0c5]">
+                Beneath the surface, our planet is always changing.
+              </p>
+            </div>
+          </div>
         </section>
-      )}
 
-      {/* Feature Modules Quick Access */}
-      <section aria-label="Feature modules">
-        <div className="flex items-center justify-between mb-3 px-1">
-          <h2 className="text-xs font-mono uppercase tracking-wider text-slate-400">
-            Navigation Modules
-          </h2>
-          <span className="text-[11px] text-emerald-400 font-mono">
-            {data ? `${data.features.length} Live Seismic Events` : 'Syncing...'}
-          </span>
-        </div>
+        <section className="grid border-b border-[var(--border)] sm:grid-cols-3">
+          {[
+            ['01 / EARTHQUAKES', 'When the ground moves', 'Earthquakes happen when energy is released as rocks move along faults.'],
+            ['02 / VOLCANOES', 'When the Earth erupts', 'Magma, gas, and pressure can produce eruptions and different hazards.'],
+            ['03 / THE EVIDENCE', 'Understand the data', 'Scientific observations help us understand activity, but cannot predict every event.'],
+          ].map(([eyebrow, title, description], i) => (
+            <article key={eyebrow} className={`py-5 sm:pr-5 ${i > 0 ? 'border-t border-[var(--border)] sm:border-l sm:border-t-0 sm:pl-5' : ''}`}>
+              <p className={labelClass}>{eyebrow}</p>
+              <h2 className="mt-2 text-lg font-bold">{title}</h2>
+              <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">{description}</p>
+            </article>
+          ))}
+        </section>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Card 1: Live Map */}
-          <button
-            type="button"
-            onClick={() => onNavigate('map')}
-            className="group p-5 rounded-2xl bg-slate-900/60 hover:bg-slate-900/90 border border-slate-800/80 hover:border-cyan-500/40 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
-          >
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-3 group-hover:scale-105 transition-transform">
-              <Globe2 className="w-5 h-5" />
+        <section id="earthquakes" className="scroll-mt-5 py-10 sm:py-14">
+          <p className={labelClass}>The planet, right now</p>
+          <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
+            <h2 className="text-4xl font-black tracking-[-.065em] sm:text-5xl">Earthquake watch<span className="text-[#d95735]">.</span></h2>
+            <button onClick={() => onNavigate('map')} className="flex items-center gap-2 pb-1 text-sm font-bold hover:text-[#d95735]">
+              Explore map <ArrowRight size={15} />
+            </button>
+          </div>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--text-muted)]">
+            Magnitude describes an earthquake’s size. Depth tells us how far
+            below the surface it began. These are recorded events, not predictions.
+          </p>
+
+          <div className="mt-6 border-y border-[var(--border)]">
+            <div className="py-3">
+              <DataCardHeader title="Recent seismic events" source="USGS" feedTime={feedGenerated} fetchTime={fetchTime} count={data?.features?.length} onRefresh={refetch} isRefreshing={loading} error={error} />
             </div>
-            <h3 className="text-sm font-semibold text-white group-hover:text-cyan-300 transition-colors flex items-center justify-between">
-              <span>Live Map</span>
-              <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-cyan-400" />
-            </h3>
-            <p className="text-xs text-slate-400 mt-1">
-              Interactive MapLibre GL map with magnitude color & scale markers.
-            </p>
-          </button>
+            {error ? (
+              <div className="py-4"><DataErrorState error={error} onRetry={refetch} isRetrying={loading} /></div>
+            ) : loading && !data ? (
+              <div className="py-4"><EarthquakeSkeleton count={5} /></div>
+            ) : quakes.length === 0 ? (
+              <p className="py-10 text-center text-sm text-[var(--text-muted)]">No earthquakes are currently listed. Try refreshing shortly.</p>
+            ) : (
+              <>
+                {quakes.map((quake, i) => {
+                  const mag = quake.properties.mag;
+                  const color = getMagnitudeColor(mag);
+                  const depth = quake.geometry.coordinates[2];
+                  return (
+                    <article key={quake.id} className="grid grid-cols-[25px_52px_minmax(0,1fr)_34px] items-center gap-3 border-t border-[var(--border)] py-4 sm:grid-cols-[35px_62px_minmax(0,1fr)_38px] sm:gap-4">
+                      <span className="font-mono text-xs text-[var(--text-muted)]">{String(i + 1).padStart(2, '0')}</span>
+                      <span className={`flex h-11 items-center justify-center border text-sm font-black ${color.bg} ${color.text} ${color.border}`} aria-label={`Magnitude ${mag ?? 'unknown'}`}>
+                        {mag !== null ? mag.toFixed(1) : '—'}
+                      </span>
+                      <div className="min-w-0">
+                        <h3 className="truncate text-sm font-bold sm:text-base">{quake.properties.place || 'Unknown location'}</h3>
+                        <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-[var(--text-muted)]">
+                          <span className="flex items-center gap-1"><Waves size={12} /> Depth: {depth !== undefined ? formatDepthKm(depth) : 'Unknown'}</span>
+                          <span>{getRelativeTime(quake.properties.time)}</span>
+                        </div>
+                      </div>
+                      <a href={quake.properties.url} target="_blank" rel="noopener noreferrer" aria-label={`View USGS details for ${quake.properties.place}`} className="grid h-9 w-9 place-items-center border border-[var(--border)] text-[#686a61] hover:border-[#d95735] hover:text-[#d95735]">
+                        <ExternalLink size={15} />
+                      </a>
+                    </article>
+                  );
+                })}
+                <div className="flex flex-wrap justify-between gap-2 border-t border-[var(--border)] py-4 text-xs text-[var(--text-muted)]">
+                  <span>Showing the 10 most recent events in this feed.</span>
+                  <button onClick={() => onNavigate('map')} className="font-bold text-[#bc4a2b]">View all events →</button>
+                </div>
+              </>
+            )}
+          </div>
+        </section>
 
-          {/* Card 2: Alerts */}
-          <button
-            type="button"
-            onClick={() => onNavigate('alerts')}
-            className="group p-5 rounded-2xl bg-slate-900/60 hover:bg-slate-900/90 border border-slate-800/80 hover:border-amber-500/40 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
-          >
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-3 group-hover:scale-105 transition-transform">
-              <AlertTriangle className="w-5 h-5" />
-            </div>
-            <h3 className="text-sm font-semibold text-white group-hover:text-amber-300 transition-colors flex items-center justify-between">
-              <span>Alerts (M4.5+)</span>
-              <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-amber-400" />
-            </h3>
-            <p className="text-xs text-slate-400 mt-1">
-              Critical in-app alerts for quakes magnitude 4.5 and higher.
+        {!error && quakes.length > 0 && (
+          <section className="mb-10 border-y border-[var(--border)] py-7">
+            <p className={labelClass}>Read the data</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Earthquake magnitudes</h2>
+            <p className="mb-5 mt-2 max-w-2xl text-sm leading-6 text-[var(--text-muted)]">
+              Magnitude is measured on a logarithmic scale: even a small numerical
+              increase can mean a much larger earthquake.
             </p>
-          </button>
+            <EarthquakeMagnitudeChart quakes={quakes} />
+          </section>
+        )}
 
-          {/* Card 3: News */}
-          <button
-            type="button"
-            onClick={() => onNavigate('news')}
-            className="group p-5 rounded-2xl bg-slate-900/60 hover:bg-slate-900/90 border border-slate-800/80 hover:border-violet-500/40 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
-          >
-            <div className="w-10 h-10 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center text-violet-400 mb-3 group-hover:scale-105 transition-transform">
-              <Radio className="w-5 h-5" />
-            </div>
-            <h3 className="text-sm font-semibold text-white group-hover:text-violet-300 transition-colors flex items-center justify-between">
-              <span>News & Bulletins</span>
-              <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-violet-400" />
-            </h3>
-            <p className="text-xs text-slate-400 mt-1">
-              Observatory communiqués and geological studies.
-            </p>
-          </button>
+        <section className="pb-8">
+          <p className={labelClass}>Keep exploring</p>
+          <h2 className="mt-2 text-4xl font-black tracking-[-.06em]">Go a little deeper<span className="text-[#d95735]">.</span></h2>
+          <p className="mt-3 text-sm text-[var(--text-muted)]">Follow the data, read official updates, and discover volcanoes.</p>
+          <div className="mt-5 grid sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { title: 'Live map', desc: 'Explore earthquake locations around the world.', icon: Globe2, route: 'map' as AppRoute },
+              { title: 'Earthquake alerts', desc: 'Browse the app’s magnitude-based alerts.', icon: AlertTriangle, route: 'alerts' as AppRoute },
+              { title: 'News & bulletins', desc: 'Read volcano observatory notices and updates.', icon: Radio, route: 'news' as AppRoute },
+              { title: 'Volcano catalog', desc: 'Discover volcanoes and scientific terminology.', icon: Search, route: 'more/search' as AppRoute },
+            ].map(({ title, desc, icon: Icon, route }) => (
+              <button key={title} onClick={() => onNavigate(route)} className={`${linkClass} sm:px-4`}>
+                <span>
+                  <Icon size={22} className="mb-4 text-[#d95735]" />
+                  <span className="block font-bold">{title}</span>
+                  <span className="mt-2 block pr-3 text-sm font-normal leading-6 text-[var(--text-muted)]">{desc}</span>
+                </span>
+                <ArrowRight size={16} className="shrink-0 transition group-hover:translate-x-1" />
+              </button>
+            ))}
+          </div>
+        </section>
 
-          {/* Card 4: Search */}
-          <button
-            type="button"
-            onClick={() => onNavigate('more/search')}
-            className="group p-5 rounded-2xl bg-slate-900/60 hover:bg-slate-900/90 border border-slate-800/80 hover:border-cyan-500/40 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
-          >
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-3 group-hover:scale-105 transition-transform">
-              <Search className="w-5 h-5" />
-            </div>
-            <h3 className="text-sm font-semibold text-white group-hover:text-cyan-300 transition-colors flex items-center justify-between">
-              <span>Volcano Catalog</span>
-              <ArrowRight className="w-3.5 h-3.5 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-cyan-400" />
-            </h3>
-            <p className="text-xs text-slate-400 mt-1">
-              Holocene volcanic edifices catalog and terminology.
-            </p>
-          </button>
-        </div>
-      </section>
+        <footer className="flex flex-col gap-2 border-t border-[var(--border)] py-5 text-xs leading-5 text-[var(--text-muted)] sm:flex-row sm:justify-between">
+          <span>VOLCANIC — explore the science beneath our feet.</span>
+          <span>Educational information, not an official emergency warning service.</span>
+        </footer>
+      </div>
 
       <TelemetryStatusModal isOpen={showDiagnostics} onClose={() => setShowDiagnostics(false)} />
-    </div>
+    </main>
   );
 };

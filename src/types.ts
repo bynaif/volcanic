@@ -68,6 +68,7 @@ export interface EarthquakeFeed {
 }
 
 export interface AppSettings {
+  theme: 'light' | 'dark' | 'system';
   notificationsEnabled: boolean;
   unitSystem: 'metric' | 'imperial';
   alertThreshold: 'all' | 'advisory' | 'warning' | 'aviation-red';

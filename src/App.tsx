@@ -82,6 +82,48 @@ function getPageTitle(route: AppRoute): string {
 
 export default function App() {
   const [currentRoute, setCurrentRoute] = useState<AppRoute>(parseHashToRoute);
+  const [themePreference, setThemePreference] = useState<'light' | 'dark' | 'system'>(() => {
+    try {
+      const saved = localStorage.getItem('volcanic_settings');
+      const parsed = saved ? JSON.parse(saved) : {};
+      return parsed.theme === 'light' || parsed.theme === 'dark' || parsed.theme === 'system'
+        ? parsed.theme
+        : 'light';
+    } catch {
+      return 'light';
+    }
+  });
+
+  useEffect(() => {
+    const applyTheme = () => {
+      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const resolvedTheme = themePreference === 'system'
+        ? (systemDark ? 'dark' : 'light')
+        : themePreference;
+
+      document.documentElement.dataset.theme = resolvedTheme;
+      document.documentElement.style.colorScheme = resolvedTheme;
+    };
+
+    applyTheme();
+
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    media.addEventListener('change', applyTheme);
+    return () => media.removeEventListener('change', applyTheme);
+  }, [themePreference]);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('volcanic_settings');
+      const parsed = saved ? JSON.parse(saved) : {};
+      localStorage.setItem('volcanic_settings', JSON.stringify({
+        ...parsed,
+        theme: themePreference,
+      }));
+    } catch {
+      // Keep the app usable when browser storage is unavailable.
+    }
+  }, [themePreference]);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -126,7 +168,7 @@ export default function App() {
       case 'more/donations':
         return <DonationsPage onNavigate={navigateTo} />;
       case 'more/settings':
-        return <SettingsPage onNavigate={navigateTo} />;
+        return <SettingsPage onNavigate={navigateTo} themePreference={themePreference} onThemeChange={setThemePreference} />;
       case 'more/help':
         return <HelpPage onNavigate={navigateTo} />;
       default:
@@ -135,7 +177,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070913] text-slate-100 flex flex-col md:flex-row font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
+    <div className="theme-page min-h-screen flex flex-col md:flex-row font-sans">
       {/* Skip to main content link for screen readers */}
       <a
         href="#main-content"

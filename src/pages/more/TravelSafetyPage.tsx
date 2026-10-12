@@ -95,7 +95,7 @@ export const TravelSafetyPage: React.FC<TravelSafetyPageProps> = ({
       <div className="flex items-center justify-between gap-3">
         <button
           onClick={() => onNavigate('more')}
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-cyan-400 transition hover:text-cyan-300"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--accent)] transition hover:text-[var(--accent-hover)]"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
           Back to More
@@ -106,10 +106,10 @@ export const TravelSafetyPage: React.FC<TravelSafetyPageProps> = ({
       </div>
 
       <header>
-        <h1 className="font-mono text-xl font-bold tracking-tight text-white md:text-2xl">
+        <h1 className="font-mono text-xl font-bold tracking-tight text-[var(--text)] md:text-2xl">
           Travel Safety & Hazard Guidance
         </h1>
-        <p className="mt-2 text-sm leading-6 text-slate-400">
+        <p className="mt-2 text-sm leading-6 text-[var(--text-muted)]">
           Practical precautions and links to official volcanic hazard
           information. Always follow the latest instructions from local
           emergency authorities.
@@ -137,10 +137,10 @@ export const TravelSafetyPage: React.FC<TravelSafetyPageProps> = ({
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 md:p-5">
+      <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 md:p-5">
         <div className="flex items-center gap-2">
-          <CheckCircle2 className="h-4 w-4 text-cyan-300" />
-          <h2 className="text-sm font-semibold text-white">
+          <CheckCircle2 className="h-4 w-4 text-[var(--accent)]" />
+          <h2 className="text-sm font-semibold text-[var(--text)]">
             Travel safety checklist
           </h2>
         </div>
@@ -161,10 +161,10 @@ export const TravelSafetyPage: React.FC<TravelSafetyPageProps> = ({
 
       <section className="space-y-3">
         <div>
-          <h2 className="text-sm font-semibold text-white">
+          <h2 className="text-sm font-semibold text-[var(--text)]">
             What to do in common situations
           </h2>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-[var(--text-muted)]">
             General precautions; local official instructions take priority.
           </p>
         </div>
@@ -172,9 +172,9 @@ export const TravelSafetyPage: React.FC<TravelSafetyPageProps> = ({
         {precautions.map(({ icon: Icon, title, points }) => (
           <article
             key={title}
-            className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 md:p-5"
+            className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 md:p-5"
           >
-            <h3 className="flex items-center gap-2 text-sm font-semibold text-cyan-200">
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-[var(--accent-hover)]">
               <Icon className="h-4 w-4 shrink-0" />
               {title}
             </h3>
@@ -195,10 +195,10 @@ export const TravelSafetyPage: React.FC<TravelSafetyPageProps> = ({
 
       <section className="space-y-3">
         <div>
-          <h2 className="text-sm font-semibold text-white">
+          <h2 className="text-sm font-semibold text-[var(--text)]">
             Official information sources
           </h2>
-          <p className="mt-1 text-xs leading-5 text-slate-400">
+          <p className="mt-1 text-xs leading-5 text-[var(--text-muted)]">
             These links open external sources. Their content and update
             schedules are controlled by the publishing organizations.
           </p>
@@ -214,12 +214,12 @@ export const TravelSafetyPage: React.FC<TravelSafetyPageProps> = ({
               className="group rounded-xl border border-slate-800 bg-slate-950/60 p-4 transition hover:border-cyan-700/70"
             >
               <div className="flex items-start justify-between gap-3">
-                <h3 className="text-xs font-semibold leading-5 text-cyan-200">
+                <h3 className="text-xs font-semibold leading-5 text-[var(--accent-hover)]">
                   {resource.title}
                 </h3>
-                <ExternalLink className="h-3.5 w-3.5 shrink-0 text-slate-500 transition group-hover:text-cyan-300" />
+                <ExternalLink className="h-3.5 w-3.5 shrink-0 text-slate-500 transition group-hover:text-[var(--accent)]" />
               </div>
-              <p className="mt-2 text-xs leading-5 text-slate-400">
+              <p className="mt-2 text-xs leading-5 text-[var(--text-muted)]">
                 {resource.description}
               </p>
               <p className="mt-3 text-[10px] text-slate-500">
@@ -237,7 +237,7 @@ export const TravelSafetyPage: React.FC<TravelSafetyPageProps> = ({
             <h2 className="text-xs font-semibold text-slate-200">
               Data transparency
             </h2>
-            <p className="mt-1 text-xs leading-5 text-slate-400">
+            <p className="mt-1 text-xs leading-5 text-[var(--text-muted)]">
               This page provides general guidance and external links; it is
               not a live hazard monitoring service or a substitute for
               emergency instructions. VOLCANIC does not generate eruption
@@ -250,7 +250,7 @@ export const TravelSafetyPage: React.FC<TravelSafetyPageProps> = ({
       <button
         type="button"
         onClick={() => window.location.reload()}
-        className="inline-flex items-center gap-2 rounded-xl border border-slate-700 px-3 py-2 text-xs text-slate-300 transition hover:border-cyan-700 hover:text-cyan-200"
+        className="inline-flex items-center gap-2 rounded-xl border border-slate-700 px-3 py-2 text-xs text-slate-300 transition hover:border-cyan-700 hover:text-[var(--accent-hover)]"
       >
         <RefreshCw className="h-3.5 w-3.5" />
         Reload page

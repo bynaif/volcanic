@@ -83,7 +83,7 @@ function alertStyle(level?: string) {
     case 'NORMAL':
       return 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300';
     default:
-      return 'border-slate-700 bg-slate-800/70 text-slate-300';
+      return 'border-[var(--border)] bg-slate-800/70 text-slate-300';
   }
 }
 
@@ -166,12 +166,12 @@ export const NewsPage: React.FC<NewsPageProps> = ({ onNavigate }) => {
     <div className="space-y-6 pb-20 md:pb-8">
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex flex-wrap items-center gap-2 text-xs text-violet-400 font-mono">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-[var(--accent)] font-mono">
             <Radio className="w-3.5 h-3.5" />
             <span>Observatory News &amp; Bulletins</span>
             <span className="text-slate-600">·</span>
             {loading && notices.length === 0 ? (
-              <span className="text-slate-400">Connecting…</span>
+              <span className="text-[var(--text-muted)]">Connecting…</span>
             ) : error && notices.length === 0 ? (
               <span className="text-amber-300">Feed unavailable</span>
             ) : (
@@ -182,18 +182,18 @@ export const NewsPage: React.FC<NewsPageProps> = ({ onNavigate }) => {
             )}
           </div>
 
-          <h1 className="text-xl md:text-2xl font-bold tracking-tight text-white font-mono">
+          <h1 className="text-xl md:text-2xl font-bold tracking-tight text-[var(--text)] font-mono">
             Volcanological Dispatches
           </h1>
 
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="mt-1 text-xs text-[var(--text-muted)]">
             Live notices from the USGS Volcano Notification Service.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
           {lastUpdated && (
-            <span className="text-[11px] text-slate-400 font-mono">
+            <span className="text-[11px] text-[var(--text-muted)] font-mono">
               Updated:{' '}
               {new Intl.DateTimeFormat('en', {
                 dateStyle: 'medium',
@@ -208,7 +208,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ onNavigate }) => {
             type="button"
             onClick={() => void loadNotices(true)}
             disabled={refreshing}
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-700 bg-slate-900/80 text-sm text-slate-200 hover:border-violet-500/50 disabled:opacity-60 transition"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-sm text-[var(--text)] hover:border-[var(--accent)] disabled:opacity-60 transition"
           >
             <RefreshCw
               className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`}
@@ -234,7 +234,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ onNavigate }) => {
           <button
             type="button"
             onClick={() => void loadNotices(true)}
-            className="text-xs font-semibold text-amber-200 hover:text-white"
+            className="text-xs font-semibold text-amber-200 hover:text-[var(--text)]"
           >
             Retry connection
           </button>
@@ -243,8 +243,8 @@ export const NewsPage: React.FC<NewsPageProps> = ({ onNavigate }) => {
 
       {loading && notices.length === 0 && (
         <div className="p-8 rounded-2xl border border-slate-800 bg-slate-900/50 text-center">
-          <RefreshCw className="w-6 h-6 mx-auto mb-3 text-violet-400 animate-spin" />
-          <p className="text-sm text-slate-200">
+          <RefreshCw className="w-6 h-6 mx-auto mb-3 text-[var(--accent)] animate-spin" />
+          <p className="text-sm text-[var(--text)]">
             Connecting to the USGS observatory feed…
           </p>
           <p className="mt-1 text-xs text-slate-500">
@@ -256,16 +256,16 @@ export const NewsPage: React.FC<NewsPageProps> = ({ onNavigate }) => {
       {!loading && notices.length === 0 && error && (
         <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/50 text-center">
           <Newspaper className="w-8 h-8 mx-auto mb-3 text-slate-500" />
-          <h2 className="text-sm font-semibold text-white">
+          <h2 className="text-sm font-semibold text-[var(--text)]">
             Live notices are temporarily unavailable
           </h2>
-          <p className="mt-2 text-xs text-slate-400">
+          <p className="mt-2 text-xs text-[var(--text-muted)]">
             Use the official source portals below in the meantime.
           </p>
           <button
             type="button"
             onClick={() => void loadNotices(true)}
-            className="mt-4 px-4 py-2 rounded-lg bg-violet-500/15 text-violet-300 text-xs font-semibold"
+            className="mt-4 px-4 py-2 rounded-lg bg-[var(--accent-soft)] text-[var(--accent)] text-xs font-semibold"
           >
             Try again
           </button>
@@ -273,7 +273,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ onNavigate }) => {
       )}
 
       {notices.length > 0 && (
-        <div className="flex items-center gap-2 text-xs text-slate-400">
+        <div className="flex items-center gap-2 text-xs text-[var(--text-muted)]">
           <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           <span>
             {notices.length} official USGS{' '}
@@ -302,14 +302,14 @@ export const NewsPage: React.FC<NewsPageProps> = ({ onNavigate }) => {
           return (
             <article
               key={key}
-              className="p-4 md:p-5 rounded-2xl bg-slate-900/60 border border-slate-800/90 hover:border-slate-700 transition"
+              className="p-4 md:p-5 rounded-2xl bg-slate-900/60 border border-slate-800/90 hover:border-[var(--border)] transition"
             >
               <div className="flex flex-col lg:flex-row lg:items-start gap-4">
                 <div className="min-w-0 flex-1 space-y-3">
                   <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono">
-                    <span className="text-violet-300 font-semibold">USGS</span>
+                    <span className="text-[var(--accent)] font-semibold">USGS</span>
                     <span className="text-slate-600">·</span>
-                    <span className="text-slate-400">
+                    <span className="text-[var(--text-muted)]">
                       {(notice.obs || 'USGS').toUpperCase()} Observatory
                     </span>
                     <span className="text-slate-600">·</span>
@@ -319,7 +319,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ onNavigate }) => {
                     </span>
                   </div>
 
-                  <h2 className="text-sm md:text-base font-semibold leading-snug text-white">
+                  <h2 className="text-sm md:text-base font-semibold leading-snug text-[var(--text)]">
                     {title}
                   </h2>
 
@@ -337,12 +337,12 @@ export const NewsPage: React.FC<NewsPageProps> = ({ onNavigate }) => {
                                   href={section.vUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="text-sm font-medium text-slate-200 hover:text-cyan-300"
+                                  className="text-sm font-medium text-[var(--text)] hover:text-[var(--accent)]"
                                 >
                                   {section.vName}
                                 </a>
                               ) : (
-                                <span className="text-sm font-medium text-slate-200">
+                                <span className="text-sm font-medium text-[var(--text)]">
                                   {section.vName}
                                 </span>
                               ))}
@@ -370,7 +370,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ onNavigate }) => {
                           </div>
 
                           {section.synopsis && (
-                            <p className="text-xs md:text-sm leading-relaxed text-slate-400">
+                            <p className="text-xs md:text-sm leading-relaxed text-[var(--text-muted)]">
                               {section.synopsis}
                             </p>
                           )}
@@ -378,7 +378,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ onNavigate }) => {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-[var(--text-muted)]">
                       Open the original USGS notice for the full report.
                     </p>
                   )}
@@ -399,7 +399,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({ onNavigate }) => {
                       href={notice.noticeUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-cyan-300 hover:text-cyan-200 whitespace-nowrap"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[var(--accent)] hover:text-[var(--accent-hover)] whitespace-nowrap"
                     >
                       View full notice
                       <ExternalLink className="w-3.5 h-3.5" />
@@ -416,12 +416,12 @@ export const NewsPage: React.FC<NewsPageProps> = ({ onNavigate }) => {
         aria-label="Official observatory news sources"
         className="p-5 md:p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-3"
       >
-        <h2 className="text-sm font-semibold text-white flex items-center gap-2">
-          <Rss className="w-4 h-4 text-violet-400" />
+        <h2 className="text-sm font-semibold text-[var(--text)] flex items-center gap-2">
+          <Rss className="w-4 h-4 text-[var(--accent)]" />
           Official External News &amp; Dispatch Portals
         </h2>
 
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-[var(--text-muted)]">
           The live feed above contains USGS observatory notices. These
           additional official portals provide broader activity reports and
           aviation advisories.
@@ -434,13 +434,13 @@ export const NewsPage: React.FC<NewsPageProps> = ({ onNavigate }) => {
               href={source.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-violet-500/40 transition group block"
+              className="p-3.5 rounded-xl bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--accent)] transition group block"
             >
-              <div className="flex items-center justify-between text-violet-400 font-semibold mb-1">
+              <div className="flex items-center justify-between text-[var(--accent)] font-semibold mb-1">
                 <span>{source.name}</span>
                 <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
               </div>
-              <p className="text-slate-400 text-[11px]">
+              <p className="text-[var(--text-muted)] text-[11px]">
                 {source.description}
               </p>
             </a>

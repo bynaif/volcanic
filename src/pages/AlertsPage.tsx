@@ -40,7 +40,7 @@ const aviationCodes = [
     label: 'Normal',
     description:
       'Volcanic activity is considered normal for the volcano. Follow local observatory updates.',
-    classes: 'bg-emerald-950/20 border-emerald-800/40 text-emerald-400',
+    classes: 'bg-emerald-500/10 border-emerald-600/30 text-emerald-800 dark:text-emerald-300',
     dot: 'bg-emerald-500',
   },
   {
@@ -48,7 +48,7 @@ const aviationCodes = [
     label: 'Advisory',
     description:
       'Signs of elevated unrest are being observed. Check the responsible observatory for the specific assessment.',
-    classes: 'bg-yellow-950/20 border-yellow-800/40 text-yellow-400',
+    classes: 'bg-yellow-500/10 border-yellow-600/30 text-yellow-800 dark:text-yellow-300',
     dot: 'bg-yellow-500',
   },
   {
@@ -56,7 +56,7 @@ const aviationCodes = [
     label: 'Watch',
     description:
       'Volcanic unrest is elevated, or an eruption may be underway with limited ash emission. Consult the official notice.',
-    classes: 'bg-orange-950/20 border-orange-800/40 text-orange-400',
+    classes: 'bg-orange-500/10 border-orange-600/30 text-orange-800 dark:text-orange-300',
     dot: 'bg-orange-500',
   },
   {
@@ -64,7 +64,7 @@ const aviationCodes = [
     label: 'Warning',
     description:
       'An eruption with significant ash emission is occurring or expected. Follow official aviation and emergency instructions.',
-    classes: 'bg-rose-950/20 border-rose-800/40 text-rose-400',
+    classes: 'bg-rose-950/20 border-rose-800/40 text-[var(--accent)]',
     dot: 'bg-rose-500',
   },
 ];
@@ -112,19 +112,19 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({ onNavigate }) => {
   );
 
   return (
-    <div className="space-y-6 pb-20 md:pb-8">
+    <div className="theme-page space-y-6 pb-20 md:pb-8">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-rose-400">
+          <div className="flex flex-wrap items-center gap-2 font-mono text-xs text-[var(--accent)]">
             <ShieldAlert className="h-3.5 w-3.5" />
             <span>USGS Earthquake Feed</span>
-            <span aria-hidden="true" className="text-slate-600">·</span>
-            <span className="text-cyan-300">Periodically updated</span>
+            <span aria-hidden="true" className="text-[var(--border)]">·</span>
+            <span className="text-[var(--accent)]">Periodically updated</span>
           </div>
-          <h1 className="mt-1 text-xl font-bold tracking-tight text-white md:text-2xl">
+          <h1 className="mt-1 text-xl font-bold tracking-tight text-[var(--text)] md:text-2xl">
             Earthquake Alerts
           </h1>
-          <p className="mt-2 max-w-2xl text-xs leading-5 text-slate-400">
+          <p className="mt-2 max-w-2xl text-xs leading-5 text-[var(--text-muted)]">
             Significant earthquake events reported by the USGS in the last
             24 hours. These are earthquake-feed results, not volcano eruption
             alerts or a guarantee of local impact.
@@ -132,7 +132,7 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({ onNavigate }) => {
         </div>
 
         <div
-          className="flex flex-wrap items-center gap-1.5 self-start rounded-xl border border-slate-800 bg-slate-900/80 p-1 sm:self-auto"
+          className="flex flex-wrap items-center gap-1.5 self-start rounded-xl border border-[var(--border)] bg-[var(--surface)] p-1 sm:self-auto"
           aria-label="Filter earthquakes by magnitude"
         >
           {FILTERS.map((filter) => (
@@ -143,8 +143,8 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({ onNavigate }) => {
               onClick={() => setFilterThreshold(filter.id)}
               className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
                 filterThreshold === filter.id
-                  ? 'border border-rose-400/30 bg-rose-500/20 text-rose-300'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'border border-[var(--accent)] bg-[var(--accent-soft)] text-[var(--accent)]'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text)]'
               }`}
             >
               {filter.label}
@@ -155,7 +155,7 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({ onNavigate }) => {
 
       <section
         aria-label="Earthquake events reported in the last 24 hours"
-        className="space-y-4 rounded-2xl border border-slate-800/90 bg-slate-900/60 p-4 shadow-2xl backdrop-blur-xl sm:p-5"
+        className="space-y-4 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-2xl backdrop-blur-xl sm:p-5"
       >
         <DataCardHeader
           title="Earthquake Events · Last 24 Hours"
@@ -169,7 +169,7 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({ onNavigate }) => {
         />
 
         {data && (
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-[var(--text-muted)]">
             {m45Count} event{m45Count === 1 ? '' : 's'} of magnitude 4.5 or
             greater in the loaded feed. Your selected filter currently shows{' '}
             {alertQuakes.length}.
@@ -185,14 +185,14 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({ onNavigate }) => {
         ) : loading && !data ? (
           <EarthquakeSkeleton count={4} />
         ) : alertQuakes.length === 0 ? (
-          <div className="space-y-2 rounded-xl border border-slate-800/80 bg-slate-950/60 p-8 text-center">
-            <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-500/30 bg-cyan-500/10 text-cyan-300">
+          <div className="space-y-2 rounded-xl border border-[var(--border)] bg-[var(--surface-muted)] p-8 text-center">
+            <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-500/30 bg-[var(--accent-soft)] text-[var(--accent)]">
               <CheckCircle2 className="h-5 w-5" />
             </div>
-            <h2 className="text-sm font-semibold text-white">
+            <h2 className="text-sm font-semibold text-[var(--text)]">
               No matching earthquake events
             </h2>
-            <p className="mx-auto max-w-md text-xs leading-relaxed text-slate-400">
+            <p className="mx-auto max-w-md text-xs leading-relaxed text-[var(--text-muted)]">
               No events in the loaded USGS feed match this magnitude filter
               and 24-hour window. This does not mean there is no volcanic
               hazard or other local emergency. Check official local alerts.
@@ -210,7 +210,7 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({ onNavigate }) => {
               return (
                 <article
                   key={quake.id}
-                  className={`rounded-xl border bg-gradient-to-r from-slate-950/90 to-slate-900/80 p-4 shadow-lg transition sm:p-5 ${
+                  className={`rounded-xl border bg-gradient-to-r from-[var(--surface)] to-[var(--surface)] p-4 shadow-lg transition sm:p-5 ${
                     magnitude >= 6
                       ? 'border-rose-500/50 shadow-rose-950/30'
                       : magnitude >= 5
@@ -232,32 +232,32 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({ onNavigate }) => {
 
                       <div className="min-w-0 space-y-2">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="inline-flex items-center gap-1 rounded border border-slate-700 bg-slate-800/70 px-2 py-0.5 text-[11px] text-slate-300">
+                          <span className="inline-flex items-center gap-1 rounded border border-[var(--border)] bg-[var(--surface-muted)] px-2 py-0.5 text-[11px] text-[var(--text-muted)]">
                             <AlertTriangle className="h-3 w-3" />
                             Earthquake event
                           </span>
-                          <span className="font-mono text-xs text-slate-400">
+                          <span className="font-mono text-xs text-[var(--text-muted)]">
                             {getRelativeTime(quake.properties.time)}
                           </span>
                         </div>
 
-                        <h3 className="break-words text-sm font-bold text-white sm:text-base">
+                        <h3 className="break-words text-sm font-bold text-[var(--text)] sm:text-base">
                           {quake.properties.place || 'Location unavailable'}
                         </h3>
 
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-slate-300">
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-[var(--text-muted)]">
                           <span className="flex items-center gap-1.5">
-                            <Waves className="h-3.5 w-3.5 text-cyan-400" />
+                            <Waves className="h-3.5 w-3.5 text-[var(--accent)]" />
                             Depth:{' '}
                             {Number.isFinite(depth)
                               ? formatDepthKm(depth)
                               : 'Unavailable'}
                           </span>
-                          <span className="flex items-center gap-1.5 text-slate-400">
-                            <Clock className="h-3.5 w-3.5 text-violet-400" />
+                          <span className="flex items-center gap-1.5 text-[var(--text-muted)]">
+                            <Clock className="h-3.5 w-3.5 text-[var(--text-muted)]" />
                             Local: {formatTimeLocal(quake.properties.time)}
                           </span>
-                          <span className="font-mono text-[11px] text-slate-400">
+                          <span className="font-mono text-[11px] text-[var(--text-muted)]">
                             UTC: {formatTimeUTC(quake.properties.time)}
                           </span>
                         </div>
@@ -268,7 +268,7 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({ onNavigate }) => {
                       href={quake.properties.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-xs font-medium text-cyan-300 transition hover:border-cyan-400/50 hover:bg-slate-800"
+                      className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-xs font-medium text-[var(--accent)] transition hover:border-[var(--accent)] hover:opacity-90"
                     >
                       USGS event details
                       <ExternalLink className="h-3 w-3" />
@@ -283,21 +283,21 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({ onNavigate }) => {
 
       <section
         aria-label="Volcano aviation color code reference"
-        className="space-y-4 rounded-2xl border border-slate-800/80 bg-slate-900/60 p-5 md:p-6"
+        className="theme-surface theme-shadow space-y-4 rounded-2xl border p-5 md:p-6"
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Plane className="h-4 w-4 text-cyan-400" />
-            <h2 className="text-sm font-semibold text-white">
+            <Plane className="h-4 w-4 text-[var(--accent)]" />
+            <h2 className="text-sm font-semibold text-[var(--text)]">
               Volcano Aviation Color Codes
             </h2>
           </div>
-          <span className="font-mono text-[11px] text-slate-400">
+          <span className="font-mono text-[11px] text-[var(--text-muted)]">
             Reference only
           </span>
         </div>
 
-        <p className="text-xs leading-relaxed text-slate-400">
+        <p className="text-xs leading-relaxed text-[var(--text-muted)]">
           These colors describe a volcano observatory's assessment of volcanic
           activity and aviation ash hazard. They are separate from earthquake
           magnitude and are not calculated from the earthquake feed on this page.
@@ -314,7 +314,7 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({ onNavigate }) => {
                 <span className={`h-2.5 w-2.5 rounded-full ${item.dot}`} />
                 <span>{item.code} · {item.label}</span>
               </div>
-              <p className="leading-5 text-slate-300">{item.description}</p>
+              <p className="leading-5 text-[var(--text-muted)]">{item.description}</p>
             </div>
           ))}
         </div>
@@ -323,14 +323,14 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({ onNavigate }) => {
           href="https://www.usgs.gov/programs/VHP/volcano-activity-notices"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 text-xs text-cyan-300 hover:underline"
+          className="inline-flex items-center gap-1.5 text-xs text-[var(--accent)] hover:underline"
         >
           Read official USGS volcano notices
           <ExternalLink className="h-3 w-3" />
         </a>
       </section>
 
-      <p className="text-xs leading-5 text-slate-500">
+      <p className="text-xs leading-5 text-[var(--text-muted)]">
         Earthquake reports can be revised as more information becomes
         available. Magnitude alone does not determine damage, felt intensity,
         or danger at a particular location. For immediate safety decisions,

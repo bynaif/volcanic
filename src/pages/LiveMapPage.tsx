@@ -552,7 +552,7 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
     <div className="space-y-4 pb-20 md:pb-8">
       {/* Header and Source Card */}
       <DataCardHeader
-        title="Live Seismic & Volcano Activity Map"
+        title="Live Volcano Activity Map"
         source="USGS & Smithsonian GVP"
         feedTime={feedGenerated}
         fetchTime={fetchTime}
@@ -563,11 +563,11 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
       />
 
       {/* Control bar: Volcano Search box + Magnitude filters + Locate button */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-3.5 rounded-2xl bg-[var(--surface)] border border-[var(--border)]">
         {/* Requirement 4: Map search box that finds volcanoes by name and flies to them */}
         <div className="relative flex-1 max-w-md">
           <div className="relative flex items-center">
-            <Search className="absolute left-3 w-4 h-4 text-slate-400 pointer-events-none" />
+            <Search className="absolute left-3 w-4 h-4 text-[var(--text-muted)] pointer-events-none" />
             <input
               type="text"
               value={volcanoSearchQuery}
@@ -577,7 +577,7 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
               }}
               onFocus={() => setIsSearchDropdownOpen(true)}
               placeholder="Find volcano on map (e.g., Etna, Fuji, Kilauea)..."
-              className="w-full pl-9 pr-8 py-2 rounded-xl bg-slate-950 border border-slate-700/80 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400"
+              className="w-full pl-9 pr-8 py-2 rounded-xl bg-[var(--surface-muted)] border border-[var(--border)] text-xs text-[var(--text)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--accent)] focus:ring-1 focus:ring-[var(--accent)]"
             />
             {volcanoSearchQuery && (
               <button
@@ -586,7 +586,7 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
                   setVolcanoSearchQuery('');
                   setIsSearchDropdownOpen(false);
                 }}
-                className="absolute right-2.5 p-1 text-slate-400 hover:text-white"
+                className="absolute right-2.5 p-1 text-[var(--text-muted)] hover:text-[var(--text)]"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -595,24 +595,24 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
 
           {/* Autocomplete Dropdown */}
           {isSearchDropdownOpen && volcanoSearchResults.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-1.5 z-30 max-h-56 overflow-y-auto rounded-xl bg-[#090d20] border border-cyan-500/40 shadow-2xl p-1 space-y-0.5">
+            <div className="absolute top-full left-0 right-0 mt-1.5 z-30 max-h-56 overflow-y-auto rounded-xl bg-[var(--surface)] border border-[var(--border)] shadow-2xl p-1 space-y-0.5">
               {volcanoSearchResults.map((volcano) => (
                 <button
                   key={volcano.id}
                   type="button"
                   onClick={() => handleSelectVolcano(volcano)}
-                  className="w-full flex items-center justify-between p-2 rounded-lg text-left text-xs text-slate-200 hover:text-white hover:bg-cyan-500/15 transition group"
+                  className="w-full flex items-center justify-between p-2 rounded-lg text-left text-xs text-[var(--text)] hover:text-[var(--accent)] hover:bg-[var(--surface-muted)] transition group"
                 >
                   <div className="flex items-center gap-2">
-                    <Mountain className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                    <Mountain className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
                     <div>
                       <span className="font-semibold">{volcano.name}</span>
-                      <span className="text-[11px] text-slate-400 ml-1.5">
+                      <span className="text-[11px] text-[var(--text-muted)] ml-1.5">
                         {volcano.country} · {formatElevationM(volcano.elevationM)}
                       </span>
                     </div>
                   </div>
-                  <span className="text-[10px] text-cyan-400 font-mono opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="text-[10px] text-[var(--accent)] font-mono opacity-0 group-hover:opacity-100 transition-opacity">
                     Fly to →
                   </span>
                 </button>
@@ -630,8 +630,8 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
               onClick={() => setMinMag('all')}
               className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap ${
                 minMag === 'all'
-                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/30'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--border)]'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text)]'
               }`}
             >
               All Quakes ({stats.all})
@@ -642,7 +642,7 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
               className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap ${
                 minMag === '2.5'
                   ? 'bg-amber-500/20 text-amber-300 border border-amber-400/30'
-                  : 'text-slate-400 hover:text-slate-200'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text)]'
               }`}
             >
               M2.5+ ({stats.m25})
@@ -653,7 +653,7 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
               className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap ${
                 minMag === '4.5'
                   ? 'bg-rose-500/20 text-rose-300 border border-rose-400/30'
-                  : 'text-slate-400 hover:text-slate-200'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text)]'
               }`}
             >
               M4.5+ ({stats.m45})
@@ -666,7 +666,7 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
             onClick={handleLocateMe}
             disabled={isLocating}
             aria-label="Locate me using GPS"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-400/30 text-xs font-medium text-cyan-300 transition whitespace-nowrap disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--accent-soft)] hover:bg-[var(--accent-soft)] border border-[var(--border)] text-xs font-medium text-[var(--accent)] transition whitespace-nowrap disabled:opacity-50"
           >
             <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} />
             <span>{isLocating ? 'Locating...' : 'Locate Me'}</span>
@@ -678,13 +678,13 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
         <div
           role="status"
           aria-live="polite"
-          className="p-3 rounded-xl bg-slate-900 border border-cyan-500/30 text-xs text-cyan-300 flex items-center justify-between animate-in fade-in"
+          className="p-3 rounded-xl bg-[var(--surface)] border border-[var(--border)] text-xs text-[var(--accent)] flex items-center justify-between animate-in fade-in"
         >
           <span>{geoNotice}</span>
           <button
             onClick={() => setGeoNotice(null)}
             aria-label="Dismiss message"
-            className="text-slate-400 hover:text-white px-1 text-xs"
+            className="text-[var(--text-muted)] hover:text-[var(--text)] px-1 text-xs"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -702,7 +702,7 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
 
       {/* Map Container */}
       <div
-        className="relative rounded-2xl border border-slate-800 overflow-hidden shadow-2xl bg-[#070913] min-h-[400px]"
+        className="relative rounded-2xl border border-[var(--border)] overflow-hidden shadow-2xl bg-[#070913] min-h-[400px]"
         style={{ minHeight: '400px' }}
       >
         {/* 3. Visible Error State with Retry Button for Tile/Style/WebGL failures */}
@@ -717,13 +717,13 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
             </div>
             <div className="max-w-md space-y-1.5">
               <h3 className="text-base font-semibold text-white">Map Failed to Load</h3>
-              <p className="text-xs text-slate-300 leading-relaxed font-sans">{mapError}</p>
+              <p className="text-xs text-[var(--text-muted)] leading-relaxed font-sans">{mapError}</p>
             </div>
             <div className="flex items-center gap-3 pt-2">
               <button
                 type="button"
                 onClick={handleRetryMap}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-semibold shadow-lg shadow-cyan-950/50 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-[var(--text)] text-xs font-semibold shadow-lg shadow-cyan-950/50 transition-all hover:scale-105 active:scale-95 cursor-pointer"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span>Retry Map</span>
@@ -731,7 +731,7 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
               <button
                 type="button"
                 onClick={() => setMapError(null)}
-                className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition cursor-pointer"
+                className="px-3 py-2 rounded-xl bg-[var(--surface-muted)] hover:bg-[var(--surface-muted)] text-[var(--text-muted)] text-xs font-medium transition cursor-pointer"
               >
                 Dismiss
               </button>
@@ -740,7 +740,7 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
         )}
 
         {loading && !data && (
-          <div className="absolute inset-0 z-20 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 space-y-3">
+          <div className="absolute inset-0 z-20 bg-[var(--surface)] backdrop-blur-sm flex flex-col items-center justify-center p-6 space-y-3">
             <EarthquakeSkeleton type="map" />
           </div>
         )}
@@ -755,7 +755,7 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
         <div
           role="toolbar"
           aria-label="Map Zoom and View Controls"
-          className="absolute top-4 right-4 z-10 flex flex-col items-center bg-[#090d20]/90 backdrop-blur-md border border-slate-700/80 rounded-2xl p-1.5 shadow-2xl space-y-1.5 select-none"
+          className="absolute top-4 right-4 z-10 flex flex-col items-center bg-[var(--surface)] backdrop-blur-md border border-[var(--border)] rounded-2xl p-1.5 shadow-2xl space-y-1.5 select-none"
         >
           {/* Zoom In Button */}
           <button
@@ -763,7 +763,7 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
             onClick={handleZoomIn}
             aria-label="Zoom in on map"
             title="Zoom In"
-            className="w-11 h-11 sm:w-10 sm:h-10 rounded-xl bg-slate-900/80 hover:bg-cyan-500/20 active:bg-cyan-500/30 text-slate-200 hover:text-cyan-300 border border-slate-700/50 hover:border-cyan-400/40 flex items-center justify-center transition-all shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+            className="w-11 h-11 sm:w-10 sm:h-10 rounded-xl bg-[var(--surface)] hover:bg-[var(--accent-soft)] active:bg-[var(--accent-soft)] text-[var(--text)] hover:text-[var(--accent)] border border-[var(--border)] hover:border-[var(--accent)] flex items-center justify-center transition-all shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
           >
             <ZoomIn className="w-5 h-5 sm:w-4 sm:h-4" />
           </button>
@@ -774,12 +774,12 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
             onClick={handleZoomOut}
             aria-label="Zoom out of map"
             title="Zoom Out"
-            className="w-11 h-11 sm:w-10 sm:h-10 rounded-xl bg-slate-900/80 hover:bg-cyan-500/20 active:bg-cyan-500/30 text-slate-200 hover:text-cyan-300 border border-slate-700/50 hover:border-cyan-400/40 flex items-center justify-center transition-all shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+            className="w-11 h-11 sm:w-10 sm:h-10 rounded-xl bg-[var(--surface)] hover:bg-[var(--accent-soft)] active:bg-[var(--accent-soft)] text-[var(--text)] hover:text-[var(--accent)] border border-[var(--border)] hover:border-[var(--accent)] flex items-center justify-center transition-all shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
           >
             <ZoomOut className="w-5 h-5 sm:w-4 sm:h-4" />
           </button>
 
-          <div className="w-6 h-px bg-slate-800" />
+          <div className="w-6 h-px bg-[var(--surface-muted)]" />
 
           {/* Reset Zoom / Global View */}
           <button
@@ -787,45 +787,45 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
             onClick={handleResetZoom}
             aria-label="Reset map view to global extent"
             title="Reset to Global View"
-            className="w-11 h-11 sm:w-10 sm:h-10 rounded-xl bg-slate-900/80 hover:bg-cyan-500/20 active:bg-cyan-500/30 text-slate-200 hover:text-cyan-300 border border-slate-700/50 hover:border-cyan-400/40 flex items-center justify-center transition-all shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+            className="w-11 h-11 sm:w-10 sm:h-10 rounded-xl bg-[var(--surface)] hover:bg-[var(--accent-soft)] active:bg-[var(--accent-soft)] text-[var(--text)] hover:text-[var(--accent)] border border-[var(--border)] hover:border-[var(--accent)] flex items-center justify-center transition-all shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
           >
-            <Maximize2 className="w-4 h-4 text-slate-300 hover:text-cyan-300" />
+            <Maximize2 className="w-4 h-4 text-[var(--text-muted)] hover:text-[var(--accent)]" />
           </button>
 
           {/* Zoom level indicator badge */}
           <div
             aria-label={`Current map zoom level ${currentZoom.toFixed(1)}`}
-            className="px-1.5 py-0.5 text-[10px] font-mono font-medium text-slate-400 border border-slate-800 rounded-md bg-slate-950/70"
+            className="px-1.5 py-0.5 text-[10px] font-mono font-medium text-[var(--text-muted)] border border-[var(--border)] rounded-md bg-[var(--surface-muted)]"
           >
             {currentZoom.toFixed(1)}x
           </div>
         </div>
 
         {/* Map Legend Overlay */}
-        <div className="absolute bottom-4 left-4 z-10 p-3 rounded-xl bg-slate-950/85 backdrop-blur-md border border-slate-800 text-[11px] font-mono space-y-1.5 shadow-xl pointer-events-auto">
-          <div className="text-slate-400 uppercase tracking-wider text-[10px] pb-1 border-b border-slate-800">
+        <div className="absolute bottom-4 left-4 z-10 p-3 rounded-xl bg-[var(--surface)] backdrop-blur-md border border-[var(--border)] text-[11px] font-mono space-y-1.5 shadow-xl pointer-events-auto">
+          <div className="text-[var(--text-muted)] uppercase tracking-wider text-[10px] pb-1 border-b border-[var(--border)]">
             Map Legend
           </div>
           {/* Volcano Marker Legend */}
-          <div className="flex items-center gap-2 text-cyan-300">
+          <div className="flex items-center gap-2 text-[var(--accent)]">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="#00f0ff" stroke="#ffffff" strokeWidth="1.5">
               <polygon points="12,2 22,21 2,21" />
             </svg>
             <span className="font-semibold">Volcano (Tap for Summit Data)</span>
           </div>
-          <div className="flex items-center gap-2 text-slate-300">
+          <div className="flex items-center gap-2 text-[var(--text-muted)]">
             <span className="w-2.5 h-2.5 rounded-full bg-[#00f0ff]"></span>
             <span>&lt; 2.5 Micro/Minor Quake</span>
           </div>
-          <div className="flex items-center gap-2 text-slate-300">
+          <div className="flex items-center gap-2 text-[var(--text-muted)]">
             <span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]"></span>
             <span>2.5 – 4.4 Moderate Quake</span>
           </div>
-          <div className="flex items-center gap-2 text-slate-300">
+          <div className="flex items-center gap-2 text-[var(--text-muted)]">
             <span className="w-2.5 h-2.5 rounded-full bg-[#f97316]"></span>
             <span>4.5 – 5.9 Strong Quake</span>
           </div>
-          <div className="flex items-center gap-2 text-slate-300">
+          <div className="flex items-center gap-2 text-[var(--text-muted)]">
             <span className="w-2.5 h-2.5 rounded-full bg-[#f43f5e]"></span>
             <span>6.0+ Major Alert</span>
           </div>
@@ -837,9 +837,9 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
             role="dialog"
             aria-modal="false"
             aria-labelledby="quake-detail-title"
-            className="absolute top-4 left-4 right-4 sm:right-auto sm:max-w-md z-20 rounded-2xl bg-[#0c1022]/95 border border-cyan-500/40 p-4 sm:p-5 shadow-2xl backdrop-blur-xl text-slate-100 animate-in fade-in slide-in-from-top-2 duration-200"
+            className="absolute top-4 left-4 right-4 sm:right-auto sm:max-w-md z-20 rounded-2xl bg-[var(--surface)] border border-cyan-500/40 p-4 sm:p-5 shadow-2xl backdrop-blur-xl text-[var(--text)] animate-in fade-in slide-in-from-top-2 duration-200"
           >
-            <div className="flex items-start justify-between gap-3 pb-3 border-b border-slate-800">
+            <div className="flex items-start justify-between gap-3 pb-3 border-b border-[var(--border)]">
               <div className="flex items-center gap-2.5">
                 {(() => {
                   const color = getMagnitudeColor(selectedQuake.properties.mag);
@@ -855,10 +855,10 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
                   <h3 id="quake-detail-title" className="text-sm font-semibold text-white leading-tight">
                     {selectedQuake.properties.place || 'Unknown Location'}
                   </h3>
-                  <div className="flex items-center gap-2 text-[11px] text-slate-400 mt-0.5">
+                  <div className="flex items-center gap-2 text-[11px] text-[var(--text-muted)] mt-0.5">
                     <span>Depth: {formatDepthKm(selectedQuake.geometry.coordinates[2])}</span>
                     <span>·</span>
-                    <span className="text-cyan-400">
+                    <span className="text-[var(--accent)]">
                       {getRelativeTime(selectedQuake.properties.time)}
                     </span>
                   </div>
@@ -869,37 +869,37 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
                 type="button"
                 onClick={() => setSelectedQuake(null)}
                 aria-label="Close earthquake details"
-                className="text-slate-400 hover:text-white p-1 rounded-lg focus-visible:ring-2 focus-visible:ring-cyan-400"
+                className="text-[var(--text-muted)] hover:text-[var(--text)] p-1 rounded-lg focus-visible:ring-2 focus-visible:ring-cyan-400"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <div className="mt-3 space-y-2 text-xs">
-              <div className="flex items-start gap-2 text-slate-300">
-                <Clock className="w-3.5 h-3.5 text-cyan-400 shrink-0 mt-0.5" />
+              <div className="flex items-start gap-2 text-[var(--text-muted)]">
+                <Clock className="w-3.5 h-3.5 text-[var(--accent)] shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-mono">
+                  <span className="text-[var(--text-muted)] block text-[10px] uppercase font-mono">
                     Local Time
                   </span>
                   <span>{formatTimeLocal(selectedQuake.properties.time)}</span>
                 </div>
               </div>
 
-              <div className="flex items-start gap-2 text-slate-300">
+              <div className="flex items-start gap-2 text-[var(--text-muted)]">
                 <Calendar className="w-3.5 h-3.5 text-violet-400 shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-mono">
+                  <span className="text-[var(--text-muted)] block text-[10px] uppercase font-mono">
                     UTC Time
                   </span>
                   <span className="font-mono">{formatTimeUTC(selectedQuake.properties.time)}</span>
                 </div>
               </div>
 
-              <div className="flex items-start gap-2 text-slate-300">
+              <div className="flex items-start gap-2 text-[var(--text-muted)]">
                 <Compass className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />
                 <div>
-                  <span className="text-slate-400 block text-[10px] uppercase font-mono">
+                  <span className="text-[var(--text-muted)] block text-[10px] uppercase font-mono">
                     Coordinates
                   </span>
                   <span className="font-mono">
@@ -910,13 +910,13 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
               </div>
             </div>
 
-            <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
-              <span className="text-[11px] font-mono text-slate-400">USGS Event Page</span>
+            <div className="mt-4 pt-3 border-t border-[var(--border)] flex items-center justify-between">
+              <span className="text-[11px] font-mono text-[var(--text-muted)]">USGS Event Page</span>
               <a
                 href={selectedQuake.properties.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-400/40 text-cyan-300 text-xs font-semibold transition"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--accent-soft)] hover:bg-cyan-500/25 border border-[var(--border)] text-[var(--accent)] text-xs font-semibold transition"
               >
                 <span>View Full Data</span>
                 <ExternalLink className="w-3.5 h-3.5" />

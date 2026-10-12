@@ -90,7 +90,7 @@ export const HelpPage: React.FC<HelpPageProps> = ({ onNavigate }) => {
       <button
         type="button"
         onClick={() => onNavigate('more')}
-        className="inline-flex items-center gap-1.5 text-xs font-medium text-cyan-400 transition hover:text-cyan-300"
+        className="inline-flex items-center gap-1.5 text-xs font-medium text-cyan-400 transition hover:text-[var(--accent)]"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
         Back to More
@@ -101,7 +101,7 @@ export const HelpPage: React.FC<HelpPageProps> = ({ onNavigate }) => {
           <BookOpen className="h-4 w-4" />
           USER GUIDE & REFERENCES
         </div>
-        <h1 className="text-xl font-bold tracking-tight text-white md:text-2xl">
+        <h1 className="text-xl font-bold tracking-tight text-[var(--text)] md:text-2xl">
           Help & Safety Guide
         </h1>
         <p className="max-w-2xl text-sm leading-6 text-slate-400">
@@ -141,7 +141,7 @@ export const HelpPage: React.FC<HelpPageProps> = ({ onNavigate }) => {
         aria-label="How to use VOLCANIC"
         className="space-y-3 rounded-2xl border border-slate-800/80 bg-slate-900/60 p-4 sm:p-5"
       >
-        <h2 className="text-sm font-semibold text-white">How to use the app</h2>
+        <h2 className="text-sm font-semibold text-[var(--text)]">How to use the app</h2>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="flex gap-3 rounded-xl border border-slate-800 bg-slate-950/50 p-3.5">
             <Map className="h-4 w-4 shrink-0 text-cyan-400" />
@@ -154,7 +154,7 @@ export const HelpPage: React.FC<HelpPageProps> = ({ onNavigate }) => {
               <button
                 type="button"
                 onClick={() => onNavigate('map')}
-                className="mt-2 text-xs text-cyan-300 hover:underline"
+                className="mt-2 text-xs text-[var(--accent)] hover:underline"
               >
                 Open map →
               </button>
@@ -174,7 +174,7 @@ export const HelpPage: React.FC<HelpPageProps> = ({ onNavigate }) => {
               <button
                 type="button"
                 onClick={() => onNavigate('more/search')}
-                className="mt-2 text-xs text-cyan-300 hover:underline"
+                className="mt-2 text-xs text-[var(--accent)] hover:underline"
               >
                 Search volcanoes →
               </button>
@@ -192,7 +192,7 @@ export const HelpPage: React.FC<HelpPageProps> = ({ onNavigate }) => {
               <button
                 type="button"
                 onClick={() => onNavigate('alerts')}
-                className="mt-2 text-xs text-cyan-300 hover:underline"
+                className="mt-2 text-xs text-[var(--accent)] hover:underline"
               >
                 View alerts →
               </button>
@@ -212,7 +212,7 @@ export const HelpPage: React.FC<HelpPageProps> = ({ onNavigate }) => {
               <button
                 type="button"
                 onClick={() => onNavigate('news')}
-                className="mt-2 text-xs text-cyan-300 hover:underline"
+                className="mt-2 text-xs text-[var(--accent)] hover:underline"
               >
                 Read news →
               </button>
@@ -239,7 +239,7 @@ export const HelpPage: React.FC<HelpPageProps> = ({ onNavigate }) => {
         aria-label="Official data sources"
         className="space-y-3 rounded-2xl border border-slate-800/80 bg-slate-900/60 p-4 sm:p-5"
       >
-        <h2 className="text-sm font-semibold text-white">
+        <h2 className="text-sm font-semibold text-[var(--text)]">
           Official data & scientific references
         </h2>
         <p className="text-xs leading-5 text-slate-400">
@@ -272,7 +272,7 @@ export const HelpPage: React.FC<HelpPageProps> = ({ onNavigate }) => {
                       </p>
                     </div>
                   </div>
-                  <ExternalLink className="h-3.5 w-3.5 shrink-0 text-slate-500 transition group-hover:text-cyan-300" />
+                  <ExternalLink className="h-3.5 w-3.5 shrink-0 text-slate-500 transition group-hover:text-[var(--accent)]" />
                 </div>
               </a>
             );
@@ -284,7 +284,7 @@ export const HelpPage: React.FC<HelpPageProps> = ({ onNavigate }) => {
         aria-label="Frequently asked questions"
         className="space-y-3 rounded-2xl border border-slate-800/80 bg-slate-900/60 p-4 sm:p-5"
       >
-        <h2 className="text-sm font-semibold text-white">
+        <h2 className="text-sm font-semibold text-[var(--text)]">
           Frequently asked questions
         </h2>
 

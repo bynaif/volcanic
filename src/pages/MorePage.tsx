@@ -70,7 +70,7 @@ const MENU_ITEMS: MenuItem[] = [
     label: 'Settings',
     description: 'Configure notification alerts, metric units, and telemetry cache preferences',
     icon: Settings,
-    accentColor: 'text-violet-400 bg-violet-500/10 border-violet-500/30',
+    accentColor: 'text-[var(--accent)] bg-[var(--accent-soft)] border-[var(--border)]',
   },
   {
     id: 'help',
@@ -92,10 +92,10 @@ export const MorePage: React.FC<MorePageProps> = ({ onNavigate }) => {
           <span aria-hidden="true" className="text-slate-600">·</span>
           <span className="text-amber-400">Data Offline</span>
         </div>
-        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-white mt-1">
+        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-[var(--text)] mt-1">
           More Services & Tools
         </h1>
-        <p className="text-xs text-slate-400 mt-1 max-w-lg">
+        <p className="text-xs text-[var(--text-muted)] mt-1 max-w-lg">
           Select any service below to open its dedicated view. In Phase 1, each view operates in baseline mode awaiting upstream data connection.
         </p>
       </div>
@@ -119,11 +119,11 @@ export const MorePage: React.FC<MorePageProps> = ({ onNavigate }) => {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-sm font-semibold text-white group-hover:text-cyan-300 transition-colors">
+                    <h2 className="text-sm font-semibold text-[var(--text)] group-hover:text-[var(--accent)] transition-colors">
                       {item.label}
                     </h2>
                   </div>
-                  <p className="text-xs text-slate-400 line-clamp-1 mt-0.5">
+                  <p className="text-xs text-[var(--text-muted)] line-clamp-1 mt-0.5">
                     {item.description}
                   </p>
                 </div>
@@ -143,7 +143,7 @@ export const MorePage: React.FC<MorePageProps> = ({ onNavigate }) => {
       </section>
 
       {/* Status Notice */}
-      <div className="p-4 rounded-xl bg-slate-900/40 border border-slate-800/70 flex items-center justify-between text-xs text-slate-400">
+      <div className="p-4 rounded-xl bg-slate-900/40 border border-slate-800/70 flex items-center justify-between text-xs text-[var(--text-muted)]">
         <div className="flex items-center gap-2">
           <Activity className="w-4 h-4 text-amber-400" />
           <span>All 7 sub-modules routed · Data pipelines standing by</span>

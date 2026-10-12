@@ -51,11 +51,11 @@ export const DataCardHeader: React.FC<DataCardHeaderProps> = ({
 
   return (
     <div
-      className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-xl bg-slate-900/90 border border-slate-800/90 text-xs ${className}`}
+      className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-xl theme-surface border theme-border text-xs ${className}`}
     >
       {/* Left items: Title, Live data badge, Source, Count */}
       <div className="flex flex-wrap items-center gap-2.5">
-        {title && <span className="font-semibold text-white">{title}</span>}
+        {title && <span className="font-semibold theme-text">{title}</span>}
 
         {/* Live data label with pulsing indicator */}
         <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono text-[11px] font-semibold">
@@ -67,17 +67,17 @@ export const DataCardHeader: React.FC<DataCardHeaderProps> = ({
         </div>
 
         {/* Source name */}
-        <div className="flex items-center gap-1 text-slate-400 font-mono text-[11px]">
+        <div className="flex items-center gap-1 theme-text-muted font-mono text-[11px]">
           <span className="text-slate-600">·</span>
           <span>Source:</span>
-          <span className="text-cyan-300 font-medium">{source}</span>
+          <span className="theme-accent font-medium">{source}</span>
         </div>
 
         {/* Count if available */}
         {typeof count === 'number' && (
-          <div className="hidden xs:flex items-center gap-1 text-slate-400 font-mono text-[11px]">
+          <div className="hidden xs:flex items-center gap-1 theme-text-muted font-mono text-[11px]">
             <span className="text-slate-600">·</span>
-            <span className="text-slate-300">{count} events</span>
+            <span className="theme-text-muted">{count} events</span>
           </div>
         )}
       </div>
@@ -87,20 +87,20 @@ export const DataCardHeader: React.FC<DataCardHeaderProps> = ({
         {/* Requirement 3: Show data feed's own timestamp AND fetch time separately */}
         <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono">
           {/* Feed's own generated timestamp */}
-          <div className="flex items-center gap-1 text-slate-300 bg-slate-950/70 px-2 py-0.5 rounded border border-slate-800">
-            <Clock className="w-3 h-3 text-violet-400" />
+          <div className="flex items-center gap-1 theme-text-muted theme-muted px-2 py-0.5 rounded border theme-border">
+            <Clock className="w-3 h-3 theme-accent" />
             <span className="text-slate-500">Feed Generated:</span>
-            <span className="text-violet-300 font-medium">{formatFeedTime(feedTime)}</span>
+            <span className="theme-accent font-medium">{formatFeedTime(feedTime)}</span>
           </div>
 
           {/* Client fetch timestamp */}
           <div
-            className="flex items-center gap-1 text-slate-300 bg-slate-950/70 px-2 py-0.5 rounded border border-slate-800"
+            className="flex items-center gap-1 theme-text-muted theme-muted px-2 py-0.5 rounded border theme-border"
             title={`Client Fetched at ${getFullFetchUTC(fetchTime)}`}
           >
-            <ArrowDownToLine className="w-3 h-3 text-cyan-400" />
+            <ArrowDownToLine className="w-3 h-3 theme-accent" />
             <span className="text-slate-500">Fetched:</span>
-            <span className="text-cyan-300 font-medium">{formatFetchTime(fetchTime)}</span>
+            <span className="theme-accent font-medium">{formatFetchTime(fetchTime)}</span>
           </div>
         </div>
 
@@ -111,10 +111,10 @@ export const DataCardHeader: React.FC<DataCardHeaderProps> = ({
             onClick={onRefresh}
             disabled={isRefreshing}
             aria-label="Refresh live data"
-            className="p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-800 text-slate-300 hover:text-cyan-300 border border-slate-700/80 hover:border-cyan-400/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 transition disabled:opacity-50"
+            className="p-1.5 rounded-lg theme-muted hover:theme-muted theme-text-muted hover:theme-accent border theme-border hover:border-cyan-400/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 transition disabled:opacity-50"
             title="Refresh feed"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-cyan-400' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin theme-accent' : ''}`} />
           </button>
         )}
       </div>

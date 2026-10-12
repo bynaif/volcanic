@@ -17,7 +17,7 @@ export const DataErrorState: React.FC<DataErrorStateProps> = ({
   return (
     <div
       role="alert"
-      className={`rounded-2xl bg-slate-900/90 border border-rose-500/30 p-6 md:p-8 text-center space-y-4 shadow-xl shadow-rose-950/20 backdrop-blur-xl ${className}`}
+      className={`rounded-2xl theme-surface border border-rose-500/30 p-6 md:p-8 text-center space-y-4 shadow-xl shadow-rose-950/20 backdrop-blur-xl ${className}`}
     >
       <div className="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto shadow-inner">
         <WifiOff className="w-6 h-6" />
@@ -28,10 +28,10 @@ export const DataErrorState: React.FC<DataErrorStateProps> = ({
           <AlertTriangle className="w-3.5 h-3.5" />
           <span>USGS Geological Stream Unavailable</span>
         </div>
-        <h3 className="text-base font-bold text-white">
+        <h3 className="text-base font-bold theme-text">
           Real-Time Seismic Feed Disrupted
         </h3>
-        <p className="text-xs text-slate-300 leading-relaxed">
+        <p className="text-xs theme-text-muted leading-relaxed">
           {error ||
             'The USGS earthquake GeoJSON feed could not be fetched. This may be due to temporary network connectivity loss or upstream API maintenance.'}
         </p>
@@ -42,7 +42,7 @@ export const DataErrorState: React.FC<DataErrorStateProps> = ({
           type="button"
           onClick={onRetry}
           disabled={isRetrying}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-cyan-500/15 border border-cyan-400/40 hover:bg-cyan-500/25 text-cyan-300 font-semibold text-xs transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 active:scale-95 disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-cyan-500/15 border border-cyan-400/40 hover:bg-cyan-500/25 theme-accent font-semibold text-xs transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 active:scale-95 disabled:opacity-50"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isRetrying ? 'animate-spin' : ''}`} />
           <span>{isRetrying ? 'Re-establishing Connection...' : 'Retry Feed Ingestion'}</span>

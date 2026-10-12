@@ -1,1 +1,206 @@
 @import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --page: #f7f5ef;
+  --surface: #fffefa;
+  --surface-muted: #efede5;
+  --text: #282923;
+  --text-muted: #74746b;
+  --border: #dedbd1;
+  --accent: #d95735;
+  --accent-hover: #b94327;
+  --accent-soft: #f7e5dd;
+  --success: #28744d;
+  --warning: #99621b;
+  --danger: #b93830;
+  --header-bg: rgb(247 245 239 / 92%);
+  --nav-bg: #f1efe8;
+  --shadow: 0 8px 30px rgb(44 39 29 / 5%);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #20231f;
+  --surface: #292c27;
+  --surface-muted: #32352f;
+  --text: #f3f0e7;
+  --text-muted: #b0b0a5;
+  --border: #41443c;
+  --accent: #f07855;
+  --accent-hover: #ff9878;
+  --accent-soft: #493129;
+  --success: #83cba0;
+  --warning: #edbd70;
+  --danger: #ff9187;
+  --header-bg: rgb(32 35 31 / 92%);
+  --nav-bg: #252823;
+  --shadow: 0 8px 30px rgb(0 0 0 / 12%);
+}
+
+:root,
+body,
+#root {
+  min-height: 100%;
+}
+
+html {
+  background: var(--page);
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  transition: background-color 180ms ease, color 180ms ease;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.theme-page {
+  background: var(--page);
+  color: var(--text);
+}
+
+.theme-surface {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.theme-muted {
+  background: var(--surface-muted);
+  color: var(--text-muted);
+}
+
+.theme-border {
+  border-color: var(--border);
+}
+
+.theme-text {
+  color: var(--text);
+}
+
+.theme-text-muted {
+  color: var(--text-muted);
+}
+
+.theme-accent {
+  color: var(--accent);
+}
+
+.theme-accent-bg {
+  background: var(--accent);
+  color: #fffaf4;
+}
+
+.theme-header {
+  background: var(--header-bg);
+  border-color: var(--border);
+}
+
+.theme-nav {
+  background: var(--nav-bg);
+  border-color: var(--border);
+}
+
+.theme-shadow {
+  box-shadow: var(--shadow);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+
+/* Legacy utility bridge: use theme tokens without flattening severity colors. */
+[class*="bg-slate-950"],
+[class*="bg-slate-900"],
+[class*="bg-slate-800"],
+[class*="bg-gray-950"],
+[class*="bg-gray-900"],
+[class*="bg-zinc-950"],
+[class*="bg-zinc-900"] {
+  background-color: var(--surface) !important;
+}
+
+[class*="border-slate-"],
+[class*="border-gray-"],
+[class*="border-zinc-"],
+[class*="border-cyan-"],
+[class*="border-blue-"],
+[class*="border-violet-"],
+[class*="border-indigo-"] {
+  border-color: var(--border) !important;
+}
+
+/* Neutral legacy text follows the theme; colored status text remains semantic. */
+[class*="text-slate-"]:not(.text-slate-950):not(.text-slate-900),
+[class*="text-gray-"],
+[class*="text-zinc-"] {
+  color: var(--text-muted) !important;
+}
+
+[class*="text-cyan-"],
+[class*="text-blue-"],
+[class*="text-sky-"],
+[class*="text-violet-"],
+[class*="text-indigo-"] {
+  color: var(--accent) !important;
+}
+
+[class*="hover:border-cyan-"]:hover,
+[class*="hover:border-blue-"]:hover,
+[class*="hover:border-violet-"]:hover {
+  border-color: var(--accent) !important;
+}
+
+[class*="hover:text-cyan-"]:hover,
+[class*="hover:text-blue-"]:hover,
+[class*="hover:text-violet-"]:hover {
+  color: var(--accent-hover) !important;
+}
+
+[class*="focus:ring-cyan-"]:focus,
+[class*="focus:border-cyan-"]:focus {
+  --tw-ring-color: var(--accent) !important;
+  border-color: var(--accent) !important;
+}
+
+
+/* Legacy solid accent buttons use the warm accent. */
+.bg-blue-500, .bg-blue-600, .bg-cyan-500, .bg-cyan-600,
+.bg-sky-500, .bg-sky-600, .bg-indigo-500, .bg-indigo-600,
+.bg-violet-500, .bg-violet-600 {
+  background-color: var(--accent);
+}
+

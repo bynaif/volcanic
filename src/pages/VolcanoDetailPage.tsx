@@ -88,11 +88,11 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
       case 'cloud':
         return <Cloud className={`${className} text-slate-300`} />;
       case 'rain':
-        return <CloudRain className={`${className} text-cyan-400`} />;
+        return <CloudRain className={`${className} text-[var(--accent)]`} />;
       case 'snow':
         return <CloudSnow className={`${className} text-blue-200`} />;
       case 'thunder':
-        return <CloudLightning className={`${className} text-violet-400`} />;
+        return <CloudLightning className={`${className} text-[var(--accent)]`} />;
       default:
         return <Sun className={`${className} text-amber-400`} />;
     }
@@ -105,7 +105,7 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
         <button
           type="button"
           onClick={() => onNavigate('more/search')}
-          className="inline-flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 font-medium transition"
+          className="inline-flex items-center gap-1.5 text-xs text-[var(--accent)] hover:text-[var(--accent)] font-medium transition"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
           <span>Back to Volcano Explorer</span>
@@ -114,9 +114,9 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
         <button
           type="button"
           onClick={() => onNavigate('map')}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 hover:border-cyan-400/50 text-xs font-medium text-slate-200 hover:text-cyan-300 transition"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--accent)] text-xs font-medium text-slate-200 hover:text-[var(--accent)] transition"
         >
-          <Globe2 className="w-3.5 h-3.5 text-cyan-400" />
+          <Globe2 className="w-3.5 h-3.5 text-[var(--accent)]" />
           <span>View on Global Map</span>
         </button>
       </div>
@@ -124,15 +124,15 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
       {/* Volcano Header Card */}
       <section
         aria-label="Volcano summary"
-        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#0c122e] via-[#090d22] to-[#060814] border border-cyan-500/30 p-6 md:p-8 shadow-2xl space-y-4"
+        className="relative overflow-hidden rounded-2xl bg-[var(--surface)] border border-[var(--border)] p-6 md:p-8 shadow-2xl space-y-4"
       >
         <div className="pointer-events-none absolute -top-24 -right-24 w-72 h-72 rounded-full bg-cyan-500/10 blur-3xl"></div>
-        <div className="pointer-events-none absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-violet-600/10 blur-3xl"></div>
+        <div className="pointer-events-none absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-[var(--accent)]/10 blur-3xl"></div>
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-start justify-between gap-6">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2 text-xs">
-              <span className="font-mono text-cyan-400 uppercase tracking-wider">
+              <span className="font-mono text-[var(--accent)] uppercase tracking-wider">
                 {volcano.country}
               </span>
               <span className="text-slate-600">·</span>
@@ -143,13 +143,13 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white font-mono">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-[var(--text)] font-mono">
               {volcano.name}
             </h1>
 
             <div className="flex flex-wrap items-center gap-3 text-xs text-slate-300 font-mono">
               <span className="flex items-center gap-1">
-                <Compass className="w-3.5 h-3.5 text-cyan-400" />
+                <Compass className="w-3.5 h-3.5 text-[var(--accent)]" />
                 <span>
                   {volcano.latitude.toFixed(3)}° N, {volcano.longitude.toFixed(3)}° E
                 </span>
@@ -165,7 +165,7 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
               href={volcano.gvpUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-400/40 text-cyan-300 text-xs font-semibold shadow-lg shadow-cyan-950/30 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-400/40 text-[var(--accent)] text-xs font-semibold shadow-lg shadow-cyan-950/30 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
             >
               <span>Smithsonian GVP Profile</span>
               <ExternalLink className="w-3.5 h-3.5" />
@@ -179,18 +179,18 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
         </div>
 
         {/* Local Time and Timezone Bar */}
-        <div className="relative z-10 p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="relative z-10 p-3.5 rounded-xl bg-[var(--surface-muted)] border border-[var(--border)] flex flex-wrap items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-violet-400" />
+            <Clock className="w-4 h-4 text-[var(--accent)]" />
             <span className="text-slate-400">Volcano Local Time:</span>
-            <span className="font-semibold text-white font-mono">
+            <span className="font-semibold text-[var(--text)] font-mono">
               {weather ? weather.localTimeFormatted : 'Calculating timezone...'}
             </span>
           </div>
 
           <div className="flex items-center gap-2 font-mono text-[11px] text-slate-400">
             <span>Timezone:</span>
-            <span className="text-cyan-300">{weather?.timezone || 'Auto'}</span>
+            <span className="text-[var(--accent)]">{weather?.timezone || 'Auto'}</span>
             {weather?.timezoneAbbreviation && (
               <span className="text-slate-500">({weather.timezoneAbbreviation})</span>
             )}
@@ -201,7 +201,7 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
       {/* Weather Section (Open-Meteo) */}
       <section
         aria-label="Volcano weather forecast"
-        className="rounded-2xl bg-slate-900/60 border border-slate-800/90 shadow-2xl backdrop-blur-xl p-4 sm:p-5 space-y-4"
+        className="rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-2xl backdrop-blur-xl p-4 sm:p-5 space-y-4"
       >
         {/* Requirement: Label the weather "Live data: Open-Meteo" with last-updated time */}
         <DataCardHeader
@@ -217,7 +217,7 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
           <DataErrorState error={weatherError} onRetry={refetchWeather} isRetrying={weatherLoading} />
         ) : weatherLoading && !weather ? (
           <div className="p-8 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
-            <RefreshCw className="w-4 h-4 animate-spin text-cyan-400" />
+            <RefreshCw className="w-4 h-4 animate-spin text-[var(--accent)]" />
             <span>Fetching real-time weather from Open-Meteo...</span>
           </div>
         ) : weather ? (
@@ -230,7 +230,7 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
                   <span>Temperature</span>
                   <Thermometer className="w-4 h-4 text-rose-400" />
                 </div>
-                <div className="text-xl sm:text-2xl font-bold text-white font-mono">
+                <div className="text-xl sm:text-2xl font-bold text-[var(--text)] font-mono">
                   {formatTemperatureC(weather.current.temperature)}
                 </div>
                 <div className="text-[11px] text-slate-400">
@@ -244,7 +244,7 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
                   <span>Conditions</span>
                   {renderWeatherIcon(getWeatherDescription(weather.current.weatherCode).iconName)}
                 </div>
-                <div className="text-sm sm:text-base font-semibold text-white truncate">
+                <div className="text-sm sm:text-base font-semibold text-[var(--text)] truncate">
                   {getWeatherDescription(weather.current.weatherCode).label}
                 </div>
                 <div className="text-[11px] text-slate-400">
@@ -256,9 +256,9 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
               <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 space-y-1">
                 <div className="flex items-center justify-between text-slate-400 text-xs">
                   <span>Wind Speed</span>
-                  <Wind className="w-4 h-4 text-cyan-400" />
+                  <Wind className="w-4 h-4 text-[var(--accent)]" />
                 </div>
-                <div className="text-xl sm:text-2xl font-bold text-white font-mono">
+                <div className="text-xl sm:text-2xl font-bold text-[var(--text)] font-mono">
                   {formatWindSpeedKmh(weather.current.windSpeed)}
                 </div>
                 <div className="text-[11px] text-slate-400">10m AGL wind vector</div>
@@ -270,7 +270,7 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
                   <span>Humidity</span>
                   <Droplets className="w-4 h-4 text-blue-400" />
                 </div>
-                <div className="text-xl sm:text-2xl font-bold text-white font-mono">
+                <div className="text-xl sm:text-2xl font-bold text-[var(--text)] font-mono">
                   {weather.current.relativeHumidity}%
                 </div>
                 <div className="text-[11px] text-slate-400">
@@ -294,21 +294,21 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
                   return (
                     <div
                       key={day.date}
-                      className="p-3 rounded-xl bg-slate-950/80 border border-slate-800/80 flex flex-col items-center text-center space-y-1.5"
+                      className="p-3 rounded-xl bg-[var(--surface-muted)] border border-[var(--border)] flex flex-col items-center text-center space-y-1.5"
                     >
-                      <span className="text-xs font-semibold text-white">{dayName}</span>
+                      <span className="text-xs font-semibold text-[var(--text)]">{dayName}</span>
                       <span className="text-[10px] text-slate-400 font-mono">{dateStr}</span>
                       <div className="my-1">{renderWeatherIcon(desc.iconName, 'w-6 h-6')}</div>
                       <span className="text-[11px] text-slate-300 font-medium truncate w-full">
                         {desc.label}
                       </span>
                       <div className="text-xs font-mono text-slate-200">
-                        <span className="text-white font-bold">{formatTemperatureC(day.tempMax)}</span>
+                        <span className="text-[var(--text)] font-bold">{formatTemperatureC(day.tempMax)}</span>
                         <span className="text-slate-500 mx-1">/</span>
                         <span className="text-slate-400">{formatTemperatureC(day.tempMin)}</span>
                       </div>
                       {day.precipitationSum > 0 && (
-                        <span className="text-[10px] text-cyan-400 font-mono">
+                        <span className="text-[10px] text-[var(--accent)] font-mono">
                           {formatPrecipitationMm(day.precipitationSum)}
                         </span>
                       )}
@@ -324,7 +324,7 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
       {/* Recent Earthquakes Within 100 km */}
       <section
         aria-label="Nearby earthquakes"
-        className="rounded-2xl bg-slate-900/60 border border-slate-800/90 shadow-2xl backdrop-blur-xl p-4 sm:p-5 space-y-4"
+        className="rounded-2xl bg-[var(--surface)] border border-[var(--border)] shadow-2xl backdrop-blur-xl p-4 sm:p-5 space-y-4"
       >
         <DataCardHeader
           title={`Recent Earthquakes Within 100 km of ${volcano.name}`}
@@ -341,15 +341,15 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
           <DataErrorState error={quakeError} onRetry={refetchQuakes} isRetrying={quakeLoading} />
         ) : quakeLoading && !earthquakeData ? (
           <div className="p-8 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
-            <RefreshCw className="w-4 h-4 animate-spin text-cyan-400" />
+            <RefreshCw className="w-4 h-4 animate-spin text-[var(--accent)]" />
             <span>Scanning seismic feeds within 100 km radius...</span>
           </div>
         ) : nearbyEarthquakes.length === 0 ? (
-          <div className="p-8 text-center rounded-xl bg-slate-950/60 border border-slate-800/80 space-y-2">
-            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 flex items-center justify-center mx-auto mb-2">
+          <div className="p-8 text-center rounded-xl bg-[var(--surface-muted)] border border-[var(--border)] space-y-2">
+            <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-[var(--accent)] flex items-center justify-center mx-auto mb-2">
               <Waves className="w-5 h-5" />
             </div>
-            <h3 className="text-sm font-semibold text-white">
+            <h3 className="text-sm font-semibold text-[var(--text)]">
               No Earthquakes Within 100 km (Past 24 Hours)
             </h3>
             <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
@@ -366,7 +366,7 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
               return (
                 <div
                   key={feature.id}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/80 hover:border-cyan-500/40 transition"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-[var(--surface-muted)] border border-[var(--border)] hover:border-cyan-500/40 transition"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div
@@ -376,11 +376,11 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
                     </div>
 
                     <div className="min-w-0">
-                      <p className="text-xs sm:text-sm font-medium text-white truncate">
+                      <p className="text-xs sm:text-sm font-medium text-[var(--text)] truncate">
                         {feature.properties.place || 'Unknown Epicenter'}
                       </p>
                       <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-400 mt-0.5">
-                        <span className="text-cyan-300 font-semibold font-mono">
+                        <span className="text-[var(--accent)] font-semibold font-mono">
                           {formatDistanceKm(distanceKm)} away
                         </span>
                         <span className="text-slate-600">·</span>
@@ -396,7 +396,7 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
                       href={feature.properties.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 hover:border-cyan-400/40 text-cyan-300 text-xs font-medium transition"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--surface-muted)] hover:bg-[var(--surface)] border border-[var(--border)] hover:border-[var(--accent)] text-[var(--accent)] text-xs font-medium transition"
                     >
                       <span>USGS Details</span>
                       <ExternalLink className="w-3 h-3" />
@@ -419,7 +419,7 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
           <span>Eruption Forecast Status</span>
         </div>
 
-        <h2 className="text-base font-bold text-white">
+        <h2 className="text-base font-bold text-[var(--text)]">
           No official forecast published by this app's sources
         </h2>
 

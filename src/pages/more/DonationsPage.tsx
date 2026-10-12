@@ -56,7 +56,7 @@ export const DonationsPage: React.FC<DonationsPageProps> = ({
       <button
         type="button"
         onClick={() => onNavigate('more')}
-        className="inline-flex items-center gap-1.5 text-xs font-medium text-cyan-400 transition hover:text-cyan-300"
+        className="inline-flex items-center gap-1.5 text-xs font-medium text-cyan-400 transition hover:text-[var(--accent)]"
       >
         <ArrowLeft className="h-3.5 w-3.5" />
         <span>Back to More</span>
@@ -67,7 +67,7 @@ export const DonationsPage: React.FC<DonationsPageProps> = ({
           <HeartHandshake className="h-4 w-4" />
           COMMUNITY SUPPORT
         </div>
-        <h1 className="text-xl font-bold tracking-tight text-white md:text-2xl">
+        <h1 className="text-xl font-bold tracking-tight text-[var(--text)] md:text-2xl">
           Support Communities
         </h1>
         <p className="max-w-2xl text-sm leading-6 text-slate-400">
@@ -101,7 +101,7 @@ export const DonationsPage: React.FC<DonationsPageProps> = ({
       >
         <div className="flex items-center gap-2">
           <ShieldCheck className="h-4 w-4 text-emerald-400" />
-          <h2 className="text-sm font-semibold text-white">
+          <h2 className="text-sm font-semibold text-[var(--text)]">
             Official organization websites
           </h2>
         </div>
@@ -119,7 +119,7 @@ export const DonationsPage: React.FC<DonationsPageProps> = ({
                   <Icon className={`h-5 w-5 ${organization.color}`} />
                 </div>
 
-                <h3 className="text-sm font-semibold text-white">
+                <h3 className="text-sm font-semibold text-[var(--text)]">
                   {organization.name}
                 </h3>
                 <p className="mt-1 text-[11px] leading-5 text-slate-500">
@@ -148,7 +148,7 @@ export const DonationsPage: React.FC<DonationsPageProps> = ({
         <div className="flex items-start gap-3">
           <Globe className="mt-0.5 h-5 w-5 shrink-0 text-violet-400" />
           <div>
-            <h2 className="text-sm font-semibold text-white">
+            <h2 className="text-sm font-semibold text-[var(--text)]">
               Before you contribute
             </h2>
             <ul className="mt-2 space-y-2 text-xs leading-5 text-slate-400">
