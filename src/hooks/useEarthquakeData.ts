@@ -12,12 +12,16 @@ export function useEarthquakeData() {
   const [data, setData] = useState<EarthquakeFeed | null>(cachedFeed);
   const [loading, setLoading] = useState<boolean>(!cachedFeed);
   const [error, setError] = useState<string | null>(null);
+  const [fetchTime, setFetchTime] = useState<Date | null>(
+    lastFetchTimestamp ? new Date(lastFetchTimestamp) : null
+  );
   const isMounted = useRef(true);
 
   const fetchData = useCallback(async (isManualRetry = false) => {
     // If not manual retry and cache is fresher than 30s, use cache
     if (!isManualRetry && cachedFeed && Date.now() - lastFetchTimestamp < 30000) {
       setData(cachedFeed);
+      setFetchTime(new Date(lastFetchTimestamp));
       setLoading(false);
       setError(null);
       return;
@@ -47,6 +51,7 @@ export function useEarthquakeData() {
 
       if (isMounted.current) {
         setData(json);
+        setFetchTime(new Date(lastFetchTimestamp));
         setError(null);
         setLoading(false);
       }
@@ -77,14 +82,15 @@ export function useEarthquakeData() {
     };
   }, [fetchData]);
 
-  const lastUpdated = data?.metadata?.generated ? new Date(data.metadata.generated) : null;
+  const feedGenerated = data?.metadata?.generated ? new Date(data.metadata.generated) : null;
 
   return {
     data,
     loading,
     error,
     refetch: () => fetchData(true),
-    lastUpdated,
+    feedGenerated,
+    fetchTime,
   };
 }
 

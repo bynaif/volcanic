@@ -8,7 +8,7 @@ interface TelemetryStatusModalProps {
 }
 
 export const TelemetryStatusModal: React.FC<TelemetryStatusModalProps> = ({ isOpen, onClose }) => {
-  const { data, loading, error, refetch, lastUpdated } = useEarthquakeData();
+  const { data, loading, error, refetch, feedGenerated, fetchTime } = useEarthquakeData();
   const [isPinging, setIsPinging] = useState(false);
   const [pingResult, setPingResult] = useState<string | null>(null);
 
@@ -80,9 +80,15 @@ export const TelemetryStatusModal: React.FC<TelemetryStatusModalProps> = ({ isOp
               <span className="text-slate-200">OpenFreeMap (Dark Style)</span>
             </div>
             <div className="flex items-center justify-between text-xs">
-              <span className="text-slate-400">Last Synced</span>
-              <span className="text-cyan-400 font-mono text-[11px]">
-                {lastUpdated ? formatTimeUTC(lastUpdated.getTime()) : 'Syncing...'}
+              <span className="text-slate-400">Feed Timestamp</span>
+              <span className="text-violet-300 font-mono text-[11px]">
+                {feedGenerated ? formatTimeUTC(feedGenerated.getTime()) : 'Syncing...'}
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-slate-400">Client Fetched</span>
+              <span className="text-cyan-300 font-mono text-[11px]">
+                {fetchTime ? formatTimeUTC(fetchTime.getTime()) : 'Syncing...'}
               </span>
             </div>
           </div>

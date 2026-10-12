@@ -9,7 +9,7 @@ export type MoreSubRoute =
   | 'settings'
   | 'help';
 
-export type AppRoute = MainRoute | `more/${MoreSubRoute}`;
+export type AppRoute = MainRoute | `more/${MoreSubRoute}` | `volcano/${string}`;
 
 export interface EarthquakeProperties {
   mag: number | null;

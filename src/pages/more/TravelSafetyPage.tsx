@@ -2,12 +2,8 @@ import React, { useState } from 'react';
 import {
   ShieldAlert,
   ArrowLeft,
+  ExternalLink,
   AlertTriangle,
-  Heart,
-  Wind,
-  Footprints,
-  Eye,
-  CheckCircle,
 } from 'lucide-react';
 import { AppRoute } from '../../types';
 import { EmptyState } from '../../components/EmptyState';
@@ -34,11 +30,11 @@ export const TravelSafetyPage: React.FC<TravelSafetyPageProps> = ({ onNavigate }
       </div>
 
       <div>
-        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-white">
+        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-white font-mono">
           Travel Safety & Exclusion Protocols
         </h1>
         <p className="text-xs text-slate-400 mt-1">
-          Volcanic hazard mitigation standards, gas safety protocols, and emergency evacuation guidelines.
+          Official volcanic hazard guidance and authoritative emergency preparedness links.
         </p>
       </div>
 
@@ -54,68 +50,69 @@ export const TravelSafetyPage: React.FC<TravelSafetyPageProps> = ({ onNavigate }
         </div>
       )}
 
-      {/* Empty State */}
+      {/* Honest Empty State */}
       <EmptyState
         icon={ShieldAlert}
-        badge="Safety Telemetry Not Connected"
-        title="Live Safety Hazard Feeds Not Connected Yet"
-        description="Dynamic danger exclusion boundaries, real-time volcanic gas sensor arrays (SO₂ and H₂S plume sensors), and ashfall hazard dispersal projections will connect to real-time ground telemetry in Phase 2."
-        secondaryInfo="When connected, this page will compute your GPS distance to the nearest active volcanic exclusion cordon and provide real-time air quality indexing."
-        actionText="Check Sensor Feeds"
-        onAction={() => setNotice('Sensor Array Check: Remote gas spectrometers not connected in Phase 1.')}
-        secondaryActionText="Return to More Menu"
+        badge="Safety Feeds Not Connected"
+        title="Live Exclusion Boundary Feeds Not Connected Yet"
+        description="Dynamic danger exclusion zone feeds and localized air quality sensor streams are not connected to this application. Consult official geological survey advisories directly before traveling near active volcanoes."
+        actionText="Test Telemetry Feed"
+        onAction={() => setNotice('Sensor feed is not connected yet.')}
+        secondaryActionText="Return to More"
         onSecondaryAction={() => onNavigate('more')}
       />
 
-      {/* Essential Volcanology Safety Principles (Real scientific guidance) */}
-      <section aria-label="Volcanic safety guidelines" className="p-5 md:p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-4">
-        <div className="flex items-center gap-2">
+      {/* Authoritative Real External Sources */}
+      <section aria-label="Authoritative volcanic health and safety portals" className="p-5 md:p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-3">
+        <h2 className="text-sm font-semibold text-white flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 text-amber-400" />
-          <h2 className="text-sm font-semibold text-white">
-            Essential Volcanic Hazard Preparedness Guidelines
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-          <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1.5">
-            <div className="flex items-center gap-2 text-cyan-400 font-semibold">
-              <Wind className="w-4 h-4" />
-              <span>Ashfall & Airway Protection</span>
+          <span>Authoritative Volcanic Hazard Guidance Portals</span>
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+          <a
+            href="https://www.ivhhn.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-amber-500/40 transition group block"
+          >
+            <div className="flex items-center justify-between text-amber-400 font-semibold mb-1">
+              <span>IVHHN Health Network</span>
+              <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </div>
-            <p className="text-slate-300 leading-relaxed">
-              Use certified N95 or P100 particle respirators. Standard cloth masks do not filter fine abrasive silica shards. Wear sealed safety goggles rather than contact lenses.
+            <p className="text-slate-400 text-[11px]">
+              International Volcanic Health Hazard Network respiratory guidelines
             </p>
-          </div>
+          </a>
 
-          <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1.5">
-            <div className="flex items-center gap-2 text-amber-400 font-semibold">
-              <Footprints className="w-4 h-4" />
-              <span>Lahars & Mudflow Valleys</span>
+          <a
+            href="https://www.usgs.gov/programs/VHP/volcanic-ash"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-amber-500/40 transition group block"
+          >
+            <div className="flex items-center justify-between text-amber-400 font-semibold mb-1">
+              <span>USGS Ash Impacts</span>
+              <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </div>
-            <p className="text-slate-300 leading-relaxed">
-              Volcanic mudflows travel at speeds exceeding 50 km/h along river channels. Never seek shelter in river valleys or downstream lowlands during rainfall or eruptions. Seek high ground immediately.
+            <p className="text-slate-400 text-[11px]">
+              Official USGS guidance on volcanic ashfall and mitigation
             </p>
-          </div>
+          </a>
 
-          <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1.5">
-            <div className="flex items-center gap-2 text-violet-400 font-semibold">
-              <Eye className="w-4 h-4" />
-              <span>Toxic Volcanic Gas Safety</span>
+          <a
+            href="https://www.redcross.org/get-help/how-to-prepare-for-emergencies/types-of-emergencies/volcano.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-amber-500/40 transition group block"
+          >
+            <div className="flex items-center justify-between text-amber-400 font-semibold mb-1">
+              <span>American Red Cross</span>
+              <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </div>
-            <p className="text-slate-300 leading-relaxed">
-              Gases such as Carbon Dioxide (CO₂) and Sulfur Dioxide (SO₂) accumulate in low-lying hollows, ravines, and caves. If sulfur odor is intense or irritation occurs, immediately move upwind and uphill.
+            <p className="text-slate-400 text-[11px]">
+              Community volcano evacuation checklist and readiness
             </p>
-          </div>
-
-          <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1.5">
-            <div className="flex items-center gap-2 text-emerald-400 font-semibold">
-              <ShieldAlert className="w-4 h-4" />
-              <span>Official Exclusion Cordons</span>
-            </div>
-            <p className="text-slate-300 leading-relaxed">
-              Always respect designated exclusion zones (typically 5 to 20 km around active vents). Ballistic volcanic bombs and pyroclastic density currents (PDCs) move too fast for escape.
-            </p>
-          </div>
+          </a>
         </div>
       </section>
     </div>

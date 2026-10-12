@@ -15,8 +15,12 @@ import {
   ZoomIn,
   ZoomOut,
   Maximize2,
+  Search,
+  Mountain,
+  ChevronRight,
 } from 'lucide-react';
 import { AppRoute, EarthquakeFeature } from '../types';
+import { WELL_KNOWN_VOLCANOES, Volcano } from '../data/volcanoes';
 import {
   useEarthquakeData,
   getMagnitudeColor,
@@ -36,18 +40,22 @@ type MinMagFilter = 'all' | '2.5' | '4.5';
 
 const OPENFREEMAP_DARK_STYLE = 'https://tiles.openfreemap.org/styles/dark';
 
-export const LiveMapPage: React.FC<LiveMapPageProps> = () => {
-  const { data, loading, error, refetch, lastUpdated } = useEarthquakeData();
+export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
+  const { data, loading, error, refetch, feedGenerated, fetchTime } = useEarthquakeData();
 
   const [minMag, setMinMag] = useState<MinMagFilter>('all');
   const [selectedQuake, setSelectedQuake] = useState<EarthquakeFeature | null>(null);
   const [isLocating, setIsLocating] = useState(false);
   const [geoNotice, setGeoNotice] = useState<string | null>(null);
 
+  // Volcano Map Search
+  const [volcanoSearchQuery, setVolcanoSearchQuery] = useState('');
+  const [isSearchDropdownOpen, setIsSearchDropdownOpen] = useState(false);
+
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const userMarkerRef = useRef<maplibregl.Marker | null>(null);
-  const popupRef = useRef<maplibregl.Popup | null>(null);
+  const volcanoMarkersRef = useRef<maplibregl.Marker[]>([]);
 
   // Filter earthquakes according to selected minimum magnitude
   const filteredFeatures = useMemo(() => {
@@ -74,6 +82,33 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = () => {
     return { all: data.features.length, m25, m45 };
   }, [data]);
 
+  // Volcano search suggestions
+  const volcanoSearchResults = useMemo(() => {
+    if (!volcanoSearchQuery.trim()) return [];
+    const q = volcanoSearchQuery.toLowerCase();
+    return WELL_KNOWN_VOLCANOES.filter(
+      (v) => v.name.toLowerCase().includes(q) || v.country.toLowerCase().includes(q)
+    );
+  }, [volcanoSearchQuery]);
+
+  // Fly to volcano on search selection
+  const handleSelectVolcano = (volcano: Volcano) => {
+    setVolcanoSearchQuery(volcano.name);
+    setIsSearchDropdownOpen(false);
+
+    const map = mapRef.current;
+    if (map) {
+      map.flyTo({
+        center: [volcano.longitude, volcano.latitude],
+        zoom: 7,
+        essential: true,
+        speed: 1.4,
+      });
+      setGeoNotice(`Centered on ${volcano.name} (${volcano.country})`);
+      setTimeout(() => setGeoNotice(null), 3000);
+    }
+  };
+
   // Initialize MapLibre GL
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -92,7 +127,7 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = () => {
       map.addControl(
         new maplibregl.AttributionControl({
           compact: true,
-          customAttribution: '© OpenFreeMap | © OpenStreetMap contributors | USGS',
+          customAttribution: '© OpenFreeMap | © OpenStreetMap | USGS | Smithsonian GVP',
         }),
         'bottom-right'
       );
@@ -100,7 +135,38 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = () => {
       map.addControl(new maplibregl.NavigationControl({ showCompass: true }), 'top-right');
 
       map.on('load', () => {
-        // Add GeoJSON source
+        // Add Volcano Triangle HTML Markers
+        volcanoMarkersRef.current.forEach((m) => m.remove());
+        volcanoMarkersRef.current = [];
+
+        WELL_KNOWN_VOLCANOES.forEach((volcano) => {
+          const el = document.createElement('div');
+          el.className = 'group volcano-marker-pin cursor-pointer select-none';
+          el.style.zIndex = '15';
+          el.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; transform: translate(-50%, -100%);">
+              <div style="background: #090d20; border: 2px solid #00f0ff; box-shadow: 0 0 12px rgba(0, 240, 255, 0.6); border-radius: 8px; padding: 3px 5px; display: flex; align-items: center; justify-content: center; transition: transform 0.2s ease;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#00f0ff" stroke="#ffffff" stroke-width="1.5">
+                  <polygon points="12,2 22,21 2,21" />
+                </svg>
+              </div>
+              <div style="width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 5px solid #00f0ff;"></div>
+            </div>
+          `;
+
+          el.addEventListener('click', (e) => {
+            e.stopPropagation();
+            onNavigate(`volcano/${volcano.id}` as AppRoute);
+          });
+
+          const marker = new maplibregl.Marker({ element: el, anchor: 'bottom' })
+            .setLngLat([volcano.longitude, volcano.latitude])
+            .addTo(map);
+
+          volcanoMarkersRef.current.push(marker);
+        });
+
+        // Add GeoJSON source for earthquakes
         map.addSource('usgs-earthquakes', {
           type: 'geojson',
           data: {
@@ -109,7 +175,7 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = () => {
           },
         });
 
-        // Layer: Outer halo glow
+        // Layer: Outer halo glow for earthquakes
         map.addLayer({
           id: 'earthquake-glow',
           type: 'circle',
@@ -137,7 +203,7 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = () => {
           },
         });
 
-        // Layer: Solid circle marker
+        // Layer: Solid circle marker for earthquakes
         map.addLayer({
           id: 'earthquake-circles',
           type: 'circle',
@@ -215,7 +281,6 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = () => {
 
           setSelectedQuake(fullFeature);
 
-          // Fly smoothly to marker
           map.flyTo({
             center: [lng, lat],
             zoom: Math.max(map.getZoom(), 4.5),
@@ -223,7 +288,6 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = () => {
           });
         });
 
-        // Cursor pointer styling
         map.on('mouseenter', 'earthquake-circles', () => {
           map.getCanvas().style.cursor = 'pointer';
         });
@@ -235,10 +299,8 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = () => {
       mapRef.current = map;
     }
 
-    return () => {
-      // Don't destroy on simple re-renders
-    };
-  }, []);
+    return () => {};
+  }, [onNavigate]);
 
   // Update GeoJSON source when features change
   useEffect(() => {
@@ -264,124 +326,181 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = () => {
 
   // Handle Browser Geolocation ("Locate Me")
   const handleLocateMe = () => {
-    if (!('geolocation' in navigator)) {
-      setGeoNotice('Geolocation is not supported by your browser.');
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      setIsLocating(false);
+      setGeoNotice('Location unavailable. Allow location access in your browser settings and try again');
       return;
     }
 
     setIsLocating(true);
     setGeoNotice(null);
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setIsLocating(false);
-        const { longitude, latitude } = position.coords;
-        const map = mapRef.current;
-        if (map) {
-          // Remove previous marker if any
-          if (userMarkerRef.current) {
-            userMarkerRef.current.remove();
+    try {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setIsLocating(false);
+          const { longitude, latitude } = position.coords;
+          const map = mapRef.current;
+          if (map) {
+            if (userMarkerRef.current) {
+              userMarkerRef.current.remove();
+            }
+
+            const el = document.createElement('div');
+            el.className = 'user-location-marker';
+            el.style.width = '18px';
+            el.style.height = '18px';
+            el.style.borderRadius = '50%';
+            el.style.backgroundColor = '#00f0ff';
+            el.style.border = '3px solid #ffffff';
+            el.style.boxShadow = '0 0 16px #00f0ff';
+
+            userMarkerRef.current = new maplibregl.Marker({ element: el })
+              .setLngLat([longitude, latitude])
+              .addTo(map);
+
+            map.flyTo({
+              center: [longitude, latitude],
+              zoom: 5.5,
+              essential: true,
+              speed: 1.4,
+            });
+            setGeoNotice('Map centered on your location.');
+            setTimeout(() => setGeoNotice(null), 3000);
           }
-
-          // Create pulse element for user location
-          const el = document.createElement('div');
-          el.className = 'user-location-marker';
-          el.style.width = '18px';
-          el.style.height = '18px';
-          el.style.borderRadius = '50%';
-          el.style.backgroundColor = '#00f0ff';
-          el.style.border = '3px solid #ffffff';
-          el.style.boxShadow = '0 0 16px #00f0ff';
-
-          userMarkerRef.current = new maplibregl.Marker({ element: el })
-            .setLngLat([longitude, latitude])
-            .addTo(map);
-
-          map.flyTo({
-            center: [longitude, latitude],
-            zoom: 5.5,
-            essential: true,
-            speed: 1.4,
-          });
-          setGeoNotice('Map centered on your location.');
-          setTimeout(() => setGeoNotice(null), 3000);
-        }
-      },
-      (err) => {
-        setIsLocating(false);
-        let msg = 'Unable to retrieve your location.';
-        if (err.code === 1) msg = 'Location access was denied.';
-        if (err.code === 2) msg = 'Position unavailable.';
-        if (err.code === 3) msg = 'Location request timed out.';
-        setGeoNotice(msg);
-        setTimeout(() => setGeoNotice(null), 4000);
-      },
-      { timeout: 10000, enableHighAccuracy: true }
-    );
+        },
+        (_err) => {
+          // Catch permission denied (code 1), unavailable (code 2), timeout (code 3), or frame restrictions
+          setIsLocating(false);
+          setGeoNotice('Location unavailable. Allow location access in your browser settings and try again');
+        },
+        { timeout: 10000, enableHighAccuracy: true }
+      );
+    } catch (_err) {
+      // Handles synchronous exceptions (e.g. frame security error or permissions policy violation)
+      setIsLocating(false);
+      setGeoNotice('Location unavailable. Allow location access in your browser settings and try again');
+    }
   };
 
   return (
     <div className="space-y-4 pb-20 md:pb-8">
       {/* Header and Source Card */}
       <DataCardHeader
-        title="Live Seismic Activity Map"
-        source="USGS"
-        lastUpdated={lastUpdated}
+        title="Live Seismic & Volcano Activity Map"
+        source="USGS & Smithsonian GVP"
+        feedTime={feedGenerated}
+        fetchTime={fetchTime}
         count={filteredFeatures.length}
         onRefresh={refetch}
         isRefreshing={loading}
       />
 
-      {/* Control bar: Magnitude filters & Locate button */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-slate-900/70 border border-slate-800">
-        {/* Magnitude filters */}
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs text-slate-400 font-mono hidden sm:inline mr-1">
-            Filter Mag:
-          </span>
-          <button
-            type="button"
-            onClick={() => setMinMag('all')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
-              minMag === 'all'
-                ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 shadow-sm shadow-cyan-950/20'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            All ({stats.all})
-          </button>
-          <button
-            type="button"
-            onClick={() => setMinMag('2.5')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
-              minMag === '2.5'
-                ? 'bg-amber-500/20 text-amber-300 border border-amber-400/30 shadow-sm shadow-amber-950/20'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            M2.5+ ({stats.m25})
-          </button>
-          <button
-            type="button"
-            onClick={() => setMinMag('4.5')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
-              minMag === '4.5'
-                ? 'bg-rose-500/20 text-rose-300 border border-rose-400/30 shadow-sm shadow-rose-950/20'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            M4.5+ ({stats.m45})
-          </button>
+      {/* Control bar: Volcano Search box + Magnitude filters + Locate button */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-3.5 rounded-2xl bg-slate-900/80 border border-slate-800">
+        {/* Requirement 4: Map search box that finds volcanoes by name and flies to them */}
+        <div className="relative flex-1 max-w-md">
+          <div className="relative flex items-center">
+            <Search className="absolute left-3 w-4 h-4 text-slate-400 pointer-events-none" />
+            <input
+              type="text"
+              value={volcanoSearchQuery}
+              onChange={(e) => {
+                setVolcanoSearchQuery(e.target.value);
+                setIsSearchDropdownOpen(true);
+              }}
+              onFocus={() => setIsSearchDropdownOpen(true)}
+              placeholder="Find volcano on map (e.g., Etna, Fuji, Kilauea)..."
+              className="w-full pl-9 pr-8 py-2 rounded-xl bg-slate-950 border border-slate-700/80 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400"
+            />
+            {volcanoSearchQuery && (
+              <button
+                type="button"
+                onClick={() => {
+                  setVolcanoSearchQuery('');
+                  setIsSearchDropdownOpen(false);
+                }}
+                className="absolute right-2.5 p-1 text-slate-400 hover:text-white"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {/* Autocomplete Dropdown */}
+          {isSearchDropdownOpen && volcanoSearchResults.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-1.5 z-30 max-h-56 overflow-y-auto rounded-xl bg-[#090d20] border border-cyan-500/40 shadow-2xl p-1 space-y-0.5">
+              {volcanoSearchResults.map((volcano) => (
+                <button
+                  key={volcano.id}
+                  type="button"
+                  onClick={() => handleSelectVolcano(volcano)}
+                  className="w-full flex items-center justify-between p-2 rounded-lg text-left text-xs text-slate-200 hover:text-white hover:bg-cyan-500/15 transition group"
+                >
+                  <div className="flex items-center gap-2">
+                    <Mountain className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                    <div>
+                      <span className="font-semibold">{volcano.name}</span>
+                      <span className="text-[11px] text-slate-400 ml-1.5">
+                        {volcano.country} · {volcano.elevationM}m
+                      </span>
+                    </div>
+                  </div>
+                  <span className="text-[10px] text-cyan-400 font-mono opacity-0 group-hover:opacity-100 transition-opacity">
+                    Fly to →
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Locate Me button */}
-        <div className="flex items-center gap-2">
+        {/* Right Controls: Filters & Locate */}
+        <div className="flex items-center justify-between sm:justify-end gap-2.5 overflow-x-auto pb-1 sm:pb-0">
+          {/* Magnitude filters */}
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setMinMag('all')}
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap ${
+                minMag === 'all'
+                  ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/30'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              All Quakes ({stats.all})
+            </button>
+            <button
+              type="button"
+              onClick={() => setMinMag('2.5')}
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap ${
+                minMag === '2.5'
+                  ? 'bg-amber-500/20 text-amber-300 border border-amber-400/30'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              M2.5+ ({stats.m25})
+            </button>
+            <button
+              type="button"
+              onClick={() => setMinMag('4.5')}
+              className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition whitespace-nowrap ${
+                minMag === '4.5'
+                  ? 'bg-rose-500/20 text-rose-300 border border-rose-400/30'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              M4.5+ ({stats.m45})
+            </button>
+          </div>
+
+          {/* Locate Me button */}
           <button
             type="button"
             onClick={handleLocateMe}
             disabled={isLocating}
             aria-label="Locate me using GPS"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-400/30 text-xs font-medium text-cyan-300 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-400/30 text-xs font-medium text-cyan-300 transition whitespace-nowrap disabled:opacity-50"
           >
             <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} />
             <span>{isLocating ? 'Locating...' : 'Locate Me'}</span>
@@ -390,10 +509,15 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = () => {
       </div>
 
       {geoNotice && (
-        <div className="p-3 rounded-xl bg-slate-900 border border-cyan-500/30 text-xs text-cyan-300 flex items-center justify-between animate-in fade-in">
+        <div
+          role="status"
+          aria-live="polite"
+          className="p-3 rounded-xl bg-slate-900 border border-cyan-500/30 text-xs text-cyan-300 flex items-center justify-between animate-in fade-in"
+        >
           <span>{geoNotice}</span>
           <button
             onClick={() => setGeoNotice(null)}
+            aria-label="Dismiss message"
             className="text-slate-400 hover:text-white px-1 text-xs"
           >
             <X className="w-3.5 h-3.5" />
@@ -426,19 +550,26 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = () => {
         {/* Map Legend Overlay */}
         <div className="absolute bottom-4 left-4 z-10 p-3 rounded-xl bg-slate-950/85 backdrop-blur-md border border-slate-800 text-[11px] font-mono space-y-1.5 shadow-xl pointer-events-auto">
           <div className="text-slate-400 uppercase tracking-wider text-[10px] pb-1 border-b border-slate-800">
-            Magnitude Scale
+            Map Legend
+          </div>
+          {/* Volcano Marker Legend */}
+          <div className="flex items-center gap-2 text-cyan-300">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#00f0ff" stroke="#ffffff" strokeWidth="1.5">
+              <polygon points="12,2 22,21 2,21" />
+            </svg>
+            <span className="font-semibold">Volcano (Tap for Summit Data)</span>
           </div>
           <div className="flex items-center gap-2 text-slate-300">
             <span className="w-2.5 h-2.5 rounded-full bg-[#00f0ff]"></span>
-            <span>&lt; 2.5 Micro/Minor</span>
+            <span>&lt; 2.5 Micro/Minor Quake</span>
           </div>
           <div className="flex items-center gap-2 text-slate-300">
             <span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b]"></span>
-            <span>2.5 – 4.4 Moderate</span>
+            <span>2.5 – 4.4 Moderate Quake</span>
           </div>
           <div className="flex items-center gap-2 text-slate-300">
             <span className="w-2.5 h-2.5 rounded-full bg-[#f97316]"></span>
-            <span>4.5 – 5.9 Strong</span>
+            <span>4.5 – 5.9 Strong Quake</span>
           </div>
           <div className="flex items-center gap-2 text-slate-300">
             <span className="w-2.5 h-2.5 rounded-full bg-[#f43f5e]"></span>

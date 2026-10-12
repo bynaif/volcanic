@@ -2,11 +2,8 @@ import React, { useState } from 'react';
 import {
   Building2,
   ArrowLeft,
-  MapPin,
-  Compass,
-  AlertCircle,
+  ExternalLink,
   Home,
-  CheckCircle,
 } from 'lucide-react';
 import { AppRoute } from '../../types';
 import { EmptyState } from '../../components/EmptyState';
@@ -39,11 +36,11 @@ export const SheltersPage: React.FC<SheltersPageProps> = ({ onNavigate }) => {
       </div>
 
       <div>
-        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-white">
+        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-white font-mono">
           Emergency Shelters & Relief Hubs
         </h1>
         <p className="text-xs text-slate-400 mt-1">
-          Civil protection evacuation centers, medical aid stations, and temporary disaster shelter registries.
+          Civil protection evacuation centers and disaster registry connections.
         </p>
       </div>
 
@@ -79,29 +76,56 @@ export const SheltersPage: React.FC<SheltersPageProps> = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* Empty State */}
+      {/* Honest Empty State */}
       <EmptyState
         icon={Building2}
         badge="Shelters Feed Not Connected"
         title="Evacuation Shelters Directory Not Connected Yet"
-        description="National disaster management registry endpoints and local emergency shelter capacity feeds are not connected in Phase 1. When integrated in Phase 2, this directory will display nearest designated safe zones, real-time occupancy, and navigation routes."
-        secondaryInfo="Civil Protection API Standards: UN OCHA Humanitarian Data Exchange (HDX) and regional emergency management shelter protocols."
-        actionText="Query Directory Feed"
-        onAction={() => setNotice('Shelter Directory Polling: 0 connected endpoints in Phase 1.')}
-        secondaryActionText="Return to More Menu"
+        description="Local disaster management registry endpoints and emergency evacuation center capacity feeds are not connected to this application. In an emergency, always follow orders from local civil defense authorities."
+        actionText="Check Connection"
+        onAction={() => setNotice('Shelter registry feed is not connected yet.')}
+        secondaryActionText="Return to More"
         onSecondaryAction={() => onNavigate('more')}
       />
 
-      {/* Protocol Information */}
-      <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-2 text-xs">
+      {/* Real External Sources Links */}
+      <section aria-label="Official emergency shelter resources" className="p-5 md:p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-3">
         <h2 className="text-sm font-semibold text-white flex items-center gap-2">
           <Home className="w-4 h-4 text-emerald-400" />
-          <span>Emergency Shelter Admission Protocols</span>
+          <span>Official Emergency Shelter Registries</span>
         </h2>
-        <p className="text-slate-300 leading-relaxed">
-          Designated volcanic evacuation shelters require arriving evacuees to remove ash-contaminated outer garments before entering enclosed sleeping quarters to prevent indoor silica air contamination.
-        </p>
-      </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <a
+            href="https://data.humdata.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-emerald-500/40 transition group block"
+          >
+            <div className="flex items-center justify-between text-emerald-400 font-semibold mb-1">
+              <span>UN OCHA Humanitarian Data Exchange</span>
+              <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </div>
+            <p className="text-slate-400 text-[11px]">
+              Global humanitarian facilities, displaced populations, and crisis data
+            </p>
+          </a>
+
+          <a
+            href="https://www.redcross.org/get-help/disaster-relief-and-recovery-services/find-an-open-shelter.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-emerald-500/40 transition group block"
+          >
+            <div className="flex items-center justify-between text-emerald-400 font-semibold mb-1">
+              <span>American Red Cross Open Shelters</span>
+              <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </div>
+            <p className="text-slate-400 text-[11px]">
+              Official locator for open emergency disaster evacuation shelters
+            </p>
+          </a>
+        </div>
+      </section>
     </div>
   );
 };

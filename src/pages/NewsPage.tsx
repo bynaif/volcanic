@@ -6,7 +6,6 @@ import {
   ExternalLink,
   RefreshCw,
   FileText,
-  BookmarkCheck,
 } from 'lucide-react';
 import { AppRoute } from '../types';
 import { EmptyState } from '../components/EmptyState';
@@ -15,16 +14,8 @@ interface NewsPageProps {
   onNavigate: (route: AppRoute) => void;
 }
 
-type NewsCategory = 'all' | 'bulletins' | 'research' | 'civil-defense';
-
 export const NewsPage: React.FC<NewsPageProps> = ({ onNavigate }) => {
-  const [activeCategory, setActiveCategory] = useState<NewsCategory>('all');
   const [notice, setNotice] = useState<string | null>(null);
-
-  const handleCategoryClick = (cat: NewsCategory) => {
-    setActiveCategory(cat);
-    setNotice(`Filtered by "${cat.toUpperCase()}": Observatory news ingest is not connected yet.`);
-  };
 
   return (
     <div className="space-y-6 pb-20 md:pb-8">
@@ -35,34 +26,11 @@ export const NewsPage: React.FC<NewsPageProps> = ({ onNavigate }) => {
             <Radio className="w-3.5 h-3.5" />
             <span>Observatory News & Bulletins</span>
             <span aria-hidden="true" className="text-slate-600">·</span>
-            <span>Feed Offline</span>
+            <span>Feed Not Connected</span>
           </div>
-          <h1 className="text-xl md:text-2xl font-bold tracking-tight text-white">
+          <h1 className="text-xl md:text-2xl font-bold tracking-tight text-white font-mono">
             Volcanological Dispatches
           </h1>
-        </div>
-
-        {/* Category Filter */}
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900/80 border border-slate-800 self-start sm:self-auto overflow-x-auto max-w-full">
-          {[
-            { id: 'all', label: 'All Dispatches' },
-            { id: 'bulletins', label: 'Observatories' },
-            { id: 'research', label: 'Research' },
-            { id: 'civil-defense', label: 'Civil Defense' },
-          ].map((cat) => (
-            <button
-              key={cat.id}
-              type="button"
-              onClick={() => handleCategoryClick(cat.id as NewsCategory)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                activeCategory === cat.id
-                  ? 'bg-violet-500/20 text-violet-300 border border-violet-400/30'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
         </div>
       </div>
 
@@ -78,38 +46,69 @@ export const NewsPage: React.FC<NewsPageProps> = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* Empty State */}
+      {/* Honest Empty State */}
       <EmptyState
         icon={Newspaper}
-        badge="News Feed Ingest Not Connected"
-        title="No Dispatches — Feed Not Connected Yet"
-        description="The scientific news and official observatory communiqué aggregator is standing by. Official weekly volcanic activity reports from the Smithsonian Institution (GVP) and daily observatory activity summaries will populate when news feeds are connected in Phase 2."
-        secondaryInfo="Target Feed Protocol: Official RSS/Atom syndication feeds and JSON-LD feeds from USGS, GVP, INGV, and PHIVOLCS."
-        actionText="Poll News Endpoints"
-        onAction={() => setNotice('Polling News Ingest: Upstream feed syndication inactive in Phase 1.')}
-        secondaryActionText="View Reports Page"
-        onSecondaryAction={() => onNavigate('more/reports')}
+        badge="News Feeds Not Connected"
+        title="Live Dispatches Feed Not Connected Yet"
+        description="Official RSS and news feeds from volcano observatories are not connected to this application. In the meantime, consult official dispatches directly at their source links below."
+        actionText="Check Feed Connection"
+        onAction={() => setNotice('Observatory news ingest feed is not connected yet.')}
+        secondaryActionText="Return to Home"
+        onSecondaryAction={() => onNavigate('home')}
       />
 
-      {/* Planned Sources Architecture */}
-      <section aria-label="Planned syndication sources" className="p-5 md:p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-3">
+      {/* Direct Links to Real External Sources */}
+      <section aria-label="Official observatory news sources" className="p-5 md:p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-3">
         <h2 className="text-sm font-semibold text-white flex items-center gap-2">
           <Rss className="w-4 h-4 text-violet-400" />
-          <span>Planned Observatory Syndication Endpoints</span>
+          <span>Official External News & Dispatch Portals</span>
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
-          <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
-            <span className="text-violet-400 font-semibold block mb-0.5">Smithsonian GVP</span>
-            <span className="text-slate-400">Weekly Volcanic Activity Report (USGS & GVP)</span>
-          </div>
-          <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
-            <span className="text-violet-400 font-semibold block mb-0.5">USGS VHP</span>
-            <span className="text-slate-400">Daily and weekly activity notices for US volcanoes</span>
-          </div>
-          <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800">
-            <span className="text-violet-400 font-semibold block mb-0.5">VAAC Advisories</span>
-            <span className="text-slate-400">Aviation ash cloud direction and flight level warnings</span>
-          </div>
+          <a
+            href="https://volcano.si.edu/reports_weekly.cfm"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-violet-500/40 transition group block"
+          >
+            <div className="flex items-center justify-between text-violet-400 font-semibold mb-1">
+              <span>Smithsonian GVP</span>
+              <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </div>
+            <p className="text-slate-400 text-[11px]">
+              Weekly Volcanic Activity Report (Smithsonian / USGS)
+            </p>
+          </a>
+
+          <a
+            href="https://www.usgs.gov/programs/VHP/volcano-activity-notices"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-violet-500/40 transition group block"
+          >
+            <div className="flex items-center justify-between text-violet-400 font-semibold mb-1">
+              <span>USGS VHP</span>
+              <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </div>
+            <p className="text-slate-400 text-[11px]">
+              Daily & weekly volcanic activity notices for US observatories
+            </p>
+          </a>
+
+          <a
+            href="https://www.weather.gov/aviation/vaac/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-violet-500/40 transition group block"
+          >
+            <div className="flex items-center justify-between text-violet-400 font-semibold mb-1">
+              <span>NOAA / ICAO VAAC</span>
+              <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </div>
+            <p className="text-slate-400 text-[11px]">
+              Volcanic Ash Advisory Center aviation bulletins
+            </p>
+          </a>
         </div>
       </section>
     </div>

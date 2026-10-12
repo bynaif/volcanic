@@ -26,8 +26,17 @@ import { DonationsPage } from './pages/more/DonationsPage';
 import { SettingsPage } from './pages/more/SettingsPage';
 import { HelpPage } from './pages/more/HelpPage';
 
+// Volcano Detail Page
+import { VolcanoDetailPage } from './pages/VolcanoDetailPage';
+import { WELL_KNOWN_VOLCANOES } from './data/volcanoes';
+
 function parseHashToRoute(): AppRoute {
   const hash = window.location.hash.replace(/^#\/?/, '').trim();
+
+  if (hash.startsWith('volcano/')) {
+    return hash as AppRoute;
+  }
+
   const validRoutes: AppRoute[] = [
     'home',
     'map',
@@ -49,13 +58,13 @@ function parseHashToRoute(): AppRoute {
   return 'home';
 }
 
-const PAGE_TITLES: Record<AppRoute, string> = {
+const STATIC_PAGE_TITLES: Record<string, string> = {
   home: 'VOLCANIC — Home',
   map: 'Live Map',
   alerts: 'Hazard Alerts',
   news: 'News & Dispatches',
   more: 'More Services',
-  'more/search': 'Volcano Search',
+  'more/search': 'Volcano Explorer',
   'more/reports': 'Geological Reports',
   'more/safety': 'Travel Safety',
   'more/shelters': 'Emergency Shelters',
@@ -63,6 +72,15 @@ const PAGE_TITLES: Record<AppRoute, string> = {
   'more/settings': 'Settings',
   'more/help': 'Help & Reference',
 };
+
+function getPageTitle(route: AppRoute): string {
+  if (route.startsWith('volcano/')) {
+    const id = route.replace(/^volcano\//, '');
+    const found = WELL_KNOWN_VOLCANOES.find((v) => v.id === id);
+    return found ? `${found.name} — Summit Details` : 'Volcano Details';
+  }
+  return STATIC_PAGE_TITLES[route] || 'VOLCANIC';
+}
 
 export default function App() {
   const [currentRoute, setCurrentRoute] = useState<AppRoute>(parseHashToRoute);
@@ -83,6 +101,11 @@ export default function App() {
   };
 
   const renderActivePage = () => {
+    if (currentRoute.startsWith('volcano/')) {
+      const volcanoId = currentRoute.replace(/^volcano\//, '');
+      return <VolcanoDetailPage volcanoId={volcanoId} onNavigate={navigateTo} />;
+    }
+
     switch (currentRoute) {
       case 'home':
         return <HomePage onNavigate={navigateTo} />;
@@ -132,7 +155,7 @@ export default function App() {
         <Header
           currentRoute={currentRoute}
           onNavigate={navigateTo}
-          title={PAGE_TITLES[currentRoute]}
+          title={getPageTitle(currentRoute)}
         />
 
         {/* Page Content with smooth transition */}

@@ -29,7 +29,7 @@ interface HomePageProps {
 
 export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
   const [showDiagnostics, setShowDiagnostics] = useState(false);
-  const { data, loading, error, refetch, lastUpdated } = useEarthquakeData();
+  const { data, loading, error, refetch, feedGenerated, fetchTime } = useEarthquakeData();
 
   // Get the 10 most recent earthquakes
   const latestTenQuakes = data?.features?.slice(0, 10) || [];
@@ -90,7 +90,8 @@ export const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
         <DataCardHeader
           title="Latest Earthquakes"
           source="USGS"
-          lastUpdated={lastUpdated}
+          feedTime={feedGenerated}
+          fetchTime={fetchTime}
           count={data?.features?.length}
           onRefresh={refetch}
           isRefreshing={loading}

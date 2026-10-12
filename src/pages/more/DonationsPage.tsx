@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import {
   HeartHandshake,
   ArrowLeft,
+  ExternalLink,
   ShieldCheck,
-  CheckCircle,
-  AlertCircle,
-  DollarSign,
 } from 'lucide-react';
 import { AppRoute } from '../../types';
 import { EmptyState } from '../../components/EmptyState';
@@ -32,11 +30,11 @@ export const DonationsPage: React.FC<DonationsPageProps> = ({ onNavigate }) => {
       </div>
 
       <div>
-        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-white">
+        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-white font-mono">
           Disaster Relief & Research Funds
         </h1>
         <p className="text-xs text-slate-400 mt-1">
-          Direct support for displaced communities, frontline emergency teams, and independent volcanological research observatories.
+          Direct links to verified international humanitarian disaster relief organizations.
         </p>
       </div>
 
@@ -52,31 +50,71 @@ export const DonationsPage: React.FC<DonationsPageProps> = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* Empty State */}
+      {/* Honest Empty State */}
       <EmptyState
         icon={HeartHandshake}
-        badge="Donation Gateways Not Connected"
-        title="Donation Channels Not Connected Yet"
-        description="Verified humanitarian disaster relief fund gateways (such as International Red Cross, UNICEF volcanic disaster funds, and geological survey field equipment funds) are not connected in Phase 1."
-        secondaryInfo="In Phase 2, verified non-profit organizations will be integrated with end-to-end transparent ledger tracking and zero intermediary commission."
-        actionText="Probe Payment Gateway"
-        onAction={() => setNotice('Donation Ingest Probe: No live payment processors or merchant IDs linked in Phase 1.')}
-        secondaryActionText="Return to More Menu"
+        badge="Payment Gateways Not Connected"
+        title="Donation Processing Not Connected Yet"
+        description="This application does not process payments or collect donations directly. To support communities affected by geological hazards, donate directly through verified international humanitarian relief organizations below."
+        actionText="Check Connection"
+        onAction={() => setNotice('Payment processing gateways are not connected.')}
+        secondaryActionText="Return to More"
         onSecondaryAction={() => onNavigate('more')}
       />
 
-      {/* Transparency Standards */}
-      <div className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-3 text-xs">
-        <div className="flex items-center gap-2">
+      {/* Real Verified Organizations Links */}
+      <section aria-label="Verified humanitarian relief organizations" className="p-5 md:p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-3">
+        <h2 className="text-sm font-semibold text-white flex items-center gap-2">
           <ShieldCheck className="w-4 h-4 text-rose-400" />
-          <h2 className="text-sm font-semibold text-white">
-            VOLCANIC Verification Standards
-          </h2>
+          <span>Verified International Relief Organizations</span>
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <a
+            href="https://www.ifrc.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-rose-500/40 transition group block"
+          >
+            <div className="flex items-center justify-between text-rose-400 font-semibold mb-1">
+              <span>IFRC</span>
+              <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </div>
+            <p className="text-slate-400 text-[11px]">
+              International Federation of Red Cross and Red Crescent Societies
+            </p>
+          </a>
+
+          <a
+            href="https://www.msf.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-rose-500/40 transition group block"
+          >
+            <div className="flex items-center justify-between text-rose-400 font-semibold mb-1">
+              <span>Doctors Without Borders</span>
+              <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </div>
+            <p className="text-slate-400 text-[11px]">
+              Médecins Sans Frontières emergency medical response teams
+            </p>
+          </a>
+
+          <a
+            href="https://www.unicef.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-rose-500/40 transition group block"
+          >
+            <div className="flex items-center justify-between text-rose-400 font-semibold mb-1">
+              <span>UNICEF</span>
+              <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </div>
+            <p className="text-slate-400 text-[11px]">
+              Emergency disaster humanitarian relief for children and families
+            </p>
+          </a>
         </div>
-        <p className="text-slate-300 leading-relaxed">
-          All emergency aid appeals displayed on VOLCANIC in Phase 2 must undergo rigorous compliance checks: verified 501(c)(3) or equivalent tax-exempt charity registration, audited disaster response deployment records, and 100% direct-to-aid allocations.
-        </p>
-      </div>
+      </section>
     </div>
   );
 };

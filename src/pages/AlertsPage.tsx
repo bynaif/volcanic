@@ -32,7 +32,7 @@ interface AlertsPageProps {
 type MinAlertFilter = '4.5' | '5.0' | '6.0' | 'all';
 
 export const AlertsPage: React.FC<AlertsPageProps> = ({ onNavigate }) => {
-  const { data, loading, error, refetch, lastUpdated } = useEarthquakeData();
+  const { data, loading, error, refetch, feedGenerated, fetchTime } = useEarthquakeData();
   const [filterThreshold, setFilterThreshold] = useState<MinAlertFilter>('4.5');
 
   // Filter for earthquakes in the last 24h meeting threshold (default 4.5+)
@@ -109,7 +109,8 @@ export const AlertsPage: React.FC<AlertsPageProps> = ({ onNavigate }) => {
         <DataCardHeader
           title="Active Geological Warnings (Last 24 Hours)"
           source="USGS"
-          lastUpdated={lastUpdated}
+          feedTime={feedGenerated}
+          fetchTime={fetchTime}
           count={alertQuakes.length}
           onRefresh={refetch}
           isRefreshing={loading}

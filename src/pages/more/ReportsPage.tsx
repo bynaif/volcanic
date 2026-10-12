@@ -2,11 +2,8 @@ import React, { useState } from 'react';
 import {
   FileText,
   ArrowLeft,
-  Filter,
-  CheckCircle2,
-  Clock,
-  Shield,
-  Send,
+  ExternalLink,
+  ShieldAlert,
 } from 'lucide-react';
 import { AppRoute } from '../../types';
 import { EmptyState } from '../../components/EmptyState';
@@ -16,13 +13,7 @@ interface ReportsPageProps {
 }
 
 export const ReportsPage: React.FC<ReportsPageProps> = ({ onNavigate }) => {
-  const [tab, setTab] = useState<'observatory' | 'satellite' | 'field'>('observatory');
   const [notice, setNotice] = useState<string | null>(null);
-
-  const handleTabChange = (t: 'observatory' | 'satellite' | 'field') => {
-    setTab(t);
-    setNotice(`Tab switched to "${t.toUpperCase()}": Report feeds are not connected yet.`);
-  };
 
   return (
     <div className="space-y-6 pb-20 md:pb-8">
@@ -39,33 +30,12 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ onNavigate }) => {
       </div>
 
       <div>
-        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-white">
+        <h1 className="text-xl md:text-2xl font-bold tracking-tight text-white font-mono">
           Geological Reports & Sensor Logs
         </h1>
         <p className="text-xs text-slate-400 mt-1">
-          Official observatory situation reports, satellite overpass analysis, and ground sensor diagnostic records.
+          Observatory situation reports, satellite observations, and ground sensor records.
         </p>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900/80 border border-slate-800 self-start overflow-x-auto max-w-full">
-        {[
-          { id: 'observatory', label: 'Observatory Bulletins' },
-          { id: 'satellite', label: 'Satellite Overpasses' },
-          { id: 'field', label: 'Field Sensor Logs' },
-        ].map((item) => (
-          <button
-            key={item.id}
-            onClick={() => handleTabChange(item.id as 'observatory' | 'satellite' | 'field')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-              tab === item.id
-                ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            {item.label}
-          </button>
-        ))}
       </div>
 
       {notice && (
@@ -80,18 +50,71 @@ export const ReportsPage: React.FC<ReportsPageProps> = ({ onNavigate }) => {
         </div>
       )}
 
-      {/* Empty State */}
+      {/* Honest Empty State */}
       <EmptyState
         icon={FileText}
-        badge="Reports Ingest Inactive"
-        title="No Geological Reports Connected Yet"
-        description="The situation report parser will ingest daily and weekly technical bulletins from USGS, INGV Catania, SERNAGEOMIN, and CVGHM. These data pipelines will be activated in Phase 2."
-        secondaryInfo="Supported Formats in Phase 2: PDF bulletin parsers, GeoTIFF satellite maps, and USGS CAP (Common Alerting Protocol) XML."
-        actionText="Verify Ingest Status"
-        onAction={() => setNotice('Pipeline Probe: No report webhooks active in Phase 1 baseline.')}
-        secondaryActionText="Return to More Menu"
+        badge="Reports Ingest Not Connected"
+        title="Reports Feed Not Connected Yet"
+        description="Direct observatory situation reports and technical sensor feeds are not connected to this application. Access official bulletins directly through the authorized observatory portals below."
+        actionText="Test Ingest Status"
+        onAction={() => setNotice('Report feed ingest pipeline is not connected yet.')}
+        secondaryActionText="Return to More"
         onSecondaryAction={() => onNavigate('more')}
       />
+
+      {/* Real External Sources Links */}
+      <section aria-label="Official observatory report portals" className="p-5 md:p-6 rounded-2xl bg-slate-900/60 border border-slate-800/80 space-y-3">
+        <h2 className="text-sm font-semibold text-white flex items-center gap-2">
+          <FileText className="w-4 h-4 text-blue-400" />
+          <span>Official Observatory Report Portals</span>
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+          <a
+            href="https://www.usgs.gov/programs/VHP/volcano-activity-notices"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-blue-500/40 transition group block"
+          >
+            <div className="flex items-center justify-between text-blue-400 font-semibold mb-1">
+              <span>USGS VHP Notices</span>
+              <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </div>
+            <p className="text-slate-400 text-[11px]">
+              Daily & weekly volcanic activity notices for US volcanoes
+            </p>
+          </a>
+
+          <a
+            href="https://volcano.si.edu/reports_weekly.cfm"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-blue-500/40 transition group block"
+          >
+            <div className="flex items-center justify-between text-blue-400 font-semibold mb-1">
+              <span>Smithsonian GVP Reports</span>
+              <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </div>
+            <p className="text-slate-400 text-[11px]">
+              Weekly global volcanic activity summaries
+            </p>
+          </a>
+
+          <a
+            href="https://www.ct.ingv.it/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 hover:border-blue-500/40 transition group block"
+          >
+            <div className="flex items-center justify-between text-blue-400 font-semibold mb-1">
+              <span>INGV Osservatorio Etneo</span>
+              <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+            </div>
+            <p className="text-slate-400 text-[11px]">
+              Surveillance bulletins for Etna, Stromboli and Sicilian volcanoes
+            </p>
+          </a>
+        </div>
+      </section>
     </div>
   );
 };

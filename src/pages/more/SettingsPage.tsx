@@ -127,30 +127,24 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ onNavigate }) => {
 
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-xs font-medium text-slate-200">Push Notifications</p>
-              <p className="text-[11px] text-slate-400">
-                Receive instant early warning alerts for Red and Orange aviation warnings
+              <div className="flex items-center gap-2">
+                <p className="text-xs font-medium text-slate-200">Push Notifications</p>
+                <span className="text-[10px] text-amber-400 font-mono px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30">
+                  Coming soon
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400 mt-0.5">
+                Automated alert dispatch is currently in development. Push notifications are not delivered at this time.
               </p>
             </div>
             <button
               type="button"
-              onClick={() => {
-                if (!settings.notificationsEnabled) {
-                  handleRequestNotifications();
-                } else {
-                  updateSetting('notificationsEnabled', false);
-                }
-              }}
-              aria-label="Toggle push notifications"
-              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 ${
-                settings.notificationsEnabled ? 'bg-cyan-500' : 'bg-slate-700'
-              }`}
+              disabled={true}
+              aria-disabled="true"
+              aria-label="Push notifications coming soon"
+              className="relative inline-flex h-6 w-11 shrink-0 cursor-not-allowed rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out bg-slate-800 opacity-60"
             >
-              <span
-                className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
-                  settings.notificationsEnabled ? 'translate-x-5' : 'translate-x-0'
-                }`}
-              />
+              <span className="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-slate-400 shadow-lg ring-0 transition duration-200 ease-in-out translate-x-0" />
             </button>
           </div>
 
