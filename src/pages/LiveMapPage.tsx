@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import * as maplibregl from 'maplibre-gl';
+import { setWorkerUrl } from 'maplibre-gl';
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
+
+setWorkerUrl(maplibreWorkerUrl);
 import 'maplibre-gl/dist/maplibre-gl.css';
 import {
   Globe2,
@@ -742,7 +746,6 @@ export const LiveMapPage: React.FC<LiveMapPageProps> = ({ onNavigate }) => {
         <div
           ref={mapContainerRef}
           className="w-full min-h-[400px] h-[calc(100dvh-260px)] md:h-[620px] bg-[#070913] relative"
-          style={{ minHeight: '400px', height: '100%' }}
         />
 
         {/* Custom MapLibre GL Zoom & View Controls (styled dark theme & touch-accessible) */}
