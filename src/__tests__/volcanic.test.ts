@@ -211,8 +211,10 @@ describe('Geodesic Distance (Haversine) Function', () => {
 // 4. Volcano Search & Filter Tests
 // ========================================================
 describe('Volcano Search and Catalog Filter', () => {
-  it('contains exactly 25 curated well-known volcanoes', () => {
-    expect(WELL_KNOWN_VOLCANOES.length).toBe(25);
+  it('contains 27 curated well-known volcanoes, including Indian volcanoes', () => {
+    expect(WELL_KNOWN_VOLCANOES.length).toBe(27);
+    expect(WELL_KNOWN_VOLCANOES.filter((v) => v.country === 'India').map((v) => v.id))
+      .toEqual(['barren-island', 'narcondam']);
   });
 
   it('each volcano has accurate coordinates and valid Smithsonian GVP links', () => {

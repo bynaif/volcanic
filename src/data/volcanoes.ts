@@ -390,6 +390,37 @@ export const WELL_KNOWN_VOLCANOES: Volcano[] = [
     observatoryName: 'Mount Erebus Volcano Observatory (MEVO)',
     observatoryUrl: 'https://erebus.nmt.edu/',
   },
+
+  {
+    id: 'barren-island',
+    name: 'Barren Island',
+    country: 'India',
+    region: 'Andaman Sea, Andaman and Nicobar Islands, India',
+    type: 'Stratovolcano',
+    latitude: 12.278,
+    longitude: 93.858,
+    elevationM: 354,
+    elevationFt: 1161,
+    gvpVn: '260010',
+    gvpUrl: 'https://volcano.si.edu/volcano.cfm?vn=260010',
+    observatoryName: 'Geological Survey of India (GSI)',
+    observatoryUrl: 'https://www.gsi.gov.in/',
+  },
+  {
+    id: 'narcondam',
+    name: 'Narcondam',
+    country: 'India',
+    region: 'Andaman Sea, Andaman and Nicobar Islands, India',
+    type: 'Stratovolcano',
+    latitude: 13.4452,
+    longitude: 94.2617,
+    elevationM: 722,
+    elevationFt: 2369,
+    gvpVn: '260001',
+    gvpUrl: 'https://volcano.si.edu/volcano.cfm?vn=260001',
+    observatoryName: 'Geological Survey of India (GSI)',
+    observatoryUrl: 'https://www.gsi.gov.in/',
+  },
 ];
 
 export function calculateDistanceKm(

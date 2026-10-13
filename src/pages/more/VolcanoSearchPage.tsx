@@ -21,8 +21,9 @@ interface VolcanoSearchPageProps {
 export const VolcanoSearchPage: React.FC<VolcanoSearchPageProps> = ({ onNavigate }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<string>('all');
+  const [selectedCountry, setSelectedCountry] = useState<string>('all');
 
-  // Filtered list of 25 volcanoes
+  // Filtered list of catalog volcanoes
   const filteredVolcanoes = useMemo(() => {
     return WELL_KNOWN_VOLCANOES.filter((v) => {
       const matchesSearch =
@@ -35,9 +36,12 @@ export const VolcanoSearchPage: React.FC<VolcanoSearchPageProps> = ({ onNavigate
         selectedType === 'all' ||
         v.type.toLowerCase().includes(selectedType.toLowerCase());
 
-      return matchesSearch && matchesType;
+      const matchesCountry =
+        selectedCountry === 'all' || v.country === selectedCountry;
+
+      return matchesSearch && matchesType && matchesCountry;
     });
-  }, [searchTerm, selectedType]);
+  }, [searchTerm, selectedType, selectedCountry]);
 
   const uniqueTypes = useMemo(() => {
     return ['all', 'Stratovolcano', 'Shield', 'Caldera', 'Complex', 'Fissure vent'];
@@ -68,7 +72,7 @@ export const VolcanoSearchPage: React.FC<VolcanoSearchPageProps> = ({ onNavigate
           Volcano Explorer & Catalog
         </h1>
         <p className="text-xs text-[var(--text-muted)] mt-1 max-w-xl">
-          Search and explore 25 major Holocene volcanic centers with official Smithsonian Global Volcanism Program coordinates, elevation, and live local summit meteorological telemetry.
+          Search and explore 27 curated volcano records, including India's Barren Island and Narcondam, with Smithsonian Global Volcanism Program references and elevation data.
         </p>
       </div>
 
@@ -96,6 +100,35 @@ export const VolcanoSearchPage: React.FC<VolcanoSearchPageProps> = ({ onNavigate
         </div>
       </div>
 
+      {/* Independent country filter */}
+      <div className="flex flex-wrap items-center gap-2 text-xs">
+        <span className="text-[var(--text-muted)] text-[11px] uppercase font-mono">
+          Country:
+        </span>
+        {[
+          { value: 'all', label: 'All Countries' },
+          { value: 'India', label: '🇮🇳 India' },
+        ].map((country) => (
+          <button
+            key={country.value}
+            type="button"
+            onClick={() => {
+              setSelectedCountry(country.value);
+              setSearchTerm('');
+              setSelectedType('all');
+            }}
+            aria-pressed={selectedCountry === country.value}
+            className={`px-3 py-1.5 rounded-lg border transition ${
+              selectedCountry === country.value
+                ? 'bg-[var(--accent-soft)] text-[var(--accent)] border-[var(--accent)]'
+                : 'bg-[var(--surface-muted)] text-[var(--text-muted)] hover:text-[var(--text)] border-[var(--border)]'
+            }`}
+          >
+            {country.label}
+          </button>
+        ))}
+      </div>
+
       {/* Morphology Filter Buttons */}
       <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
         <span className="text-[var(--text-muted)] shrink-0 text-[11px] uppercase font-mono mr-1">
@@ -105,7 +138,11 @@ export const VolcanoSearchPage: React.FC<VolcanoSearchPageProps> = ({ onNavigate
           <button
             key={type}
             type="button"
-            onClick={() => setSelectedType(type)}
+            onClick={() => {
+              setSelectedType(type);
+              setSearchTerm('');
+              setSelectedCountry('all');
+            }}
             className={`px-3 py-1.5 rounded-lg whitespace-nowrap transition ${
               selectedType === type
                 ? 'bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--border)]'
@@ -119,11 +156,11 @@ export const VolcanoSearchPage: React.FC<VolcanoSearchPageProps> = ({ onNavigate
 
       {/* Results Count & Source Notice */}
       <div className="flex items-center justify-between text-xs text-[var(--text-muted)] px-1 font-mono">
-        <span>Showing {filteredVolcanoes.length} of 25 volcanoes</span>
-        <span className="text-[var(--accent)]">GVP Holocene Registry</span>
+        <span>Showing {filteredVolcanoes.length} of {WELL_KNOWN_VOLCANOES.length} volcanoes</span>
+        <span className="text-[var(--accent)]">Smithsonian GVP Catalogue</span>
       </div>
 
-      {/* List of 25 Volcanoes */}
+      {/* List of catalog volcanoes */}
       {filteredVolcanoes.length === 0 ? (
         <div className="p-8 text-center rounded-2xl bg-[var(--surface)] border border-[var(--border)] space-y-2">
           <p className="text-sm font-semibold text-[var(--text)]">No volcanoes match your search</p>
@@ -135,6 +172,7 @@ export const VolcanoSearchPage: React.FC<VolcanoSearchPageProps> = ({ onNavigate
             onClick={() => {
               setSearchTerm('');
               setSelectedType('all');
+              setSelectedCountry('all');
             }}
             className="mt-2 px-3 py-1.5 rounded-lg bg-[var(--accent-soft)] border border-[var(--border)] text-[var(--accent)] text-xs"
           >
@@ -203,7 +241,7 @@ export const VolcanoSearchPage: React.FC<VolcanoSearchPageProps> = ({ onNavigate
                   onClick={() => onNavigate(`volcano/${volcano.id}` as AppRoute)}
                   className="inline-flex items-center gap-1 text-xs text-[var(--accent)] group-hover:text-[var(--accent)] font-semibold transition"
                 >
-                  <span>Summit Weather & Details</span>
+                  <span>Weather & Volcano Details</span>
                   <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                 </button>
               </div>

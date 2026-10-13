@@ -420,11 +420,11 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
         </div>
 
         <h2 className="text-base font-bold text-[var(--text)]">
-          No official forecast published by this app's sources
+          This app does not issue official eruption forecasts
         </h2>
 
         <p className="text-xs text-slate-300 leading-relaxed max-w-2xl">
-          VOLCANIC strictly adheres to scientific data integrity. Volcanic alert levels, aviation hazard color codes, and eruption prognoses must only be issued by the designated state authority monitoring {volcano.name}. Never rely on third-party synthetic or unverified probability models.
+          VOLCANIC strictly adheres to scientific data integrity. This page does not provide an official alert level or eruption prediction for {volcano.name}. Consult the linked scientific reference and relevant public authorities for verified updates. Weather forecasts and nearby earthquakes are not, by themselves, evidence of an impending eruption.
         </p>
 
         <div className="pt-2">
@@ -434,7 +434,7 @@ export const VolcanoDetailPage: React.FC<VolcanoDetailPageProps> = ({
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/40 text-amber-300 text-xs font-semibold transition"
           >
-            <span>Consult Official Observatory: {volcano.observatoryName}</span>
+            <span>Official reference: {volcano.observatoryName}</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </div>
